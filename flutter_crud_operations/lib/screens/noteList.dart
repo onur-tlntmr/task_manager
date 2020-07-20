@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_operations/db/DbHelper.dart';
 import 'package:flutter_crud_operations/model/Note.dart';
+import 'package:flutter_crud_operations/screens/noteDetail.dart';
 
 class NoteList extends StatefulWidget {
   @override
@@ -43,8 +44,10 @@ class NoteListState extends State {
               title: Text(this.notes[position].title),
               subtitle: Text(this.notes[position].content),
               onTap: () {
-                print("Note: Title: "+this.notes[position].title);
-              },
+
+                goToDetail(this.notes[position]);
+
+                },
 
             ),
           );
@@ -69,6 +72,15 @@ class NoteListState extends State {
       });
 
     });
+
+  }
+
+
+
+  void goToDetail(Note note) async{
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context)=>NoteDetail(note) ));
+
+    if(result) getData();
 
   }
 
