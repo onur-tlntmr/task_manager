@@ -1,7 +1,9 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_operations/db/DbHelper.dart';
 import 'package:flutter_crud_operations/model/Note.dart';
+import 'package:flutter_crud_operations/screens/noteAdd.dart';
 import 'package:flutter_crud_operations/screens/noteDetail.dart';
 
 class NoteList extends StatefulWidget {
@@ -10,7 +12,6 @@ class NoteList extends StatefulWidget {
     // TODO: implement createState
     return NoteListState();
   }
-
 }
 
 class NoteListState extends State {
@@ -27,6 +28,12 @@ class NoteListState extends State {
 
     return Scaffold(
       body: noteListItems(),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: (){
+          goToAdd();
+        },
+      ),
     );
   }
 
@@ -38,50 +45,53 @@ class NoteListState extends State {
             color: Colors.amberAccent,
             elevation: 2,
             child: ListTile(
-              leading: CircleAvatar(
-                child: Text("A"),
-              ),
               title: Text(this.notes[position].title),
               subtitle: Text(this.notes[position].content),
               onTap: () {
-
                 goToDetail(this.notes[position]);
-
-                },
+              },
+            trailing: IconButton(icon:Icon(Icons.delete),onPressed:()=>{this.deleteNote(this.notes[position])},),
 
             ),
           );
-        }
-    );
+        });
   }
 
+  void getData() {
 
-
-  void getData(){
     var noteFuture = dbHelper.getNotes(); //notelari future seklinde alir
 
-    noteFuture.then((data){ // data list tipinde alinir
+    noteFuture.then((data) {
+      // data list tipinde alinir
       List<Note> noteData = List(); // yeni liste olsuturlur
 
       // veriler note tipine donusturulerek yeni listeye eklenir
-      data.forEach((element) {noteData.add(Note.fromObject(element));});
+      data.forEach((element) {
+        noteData.add(Note.fromObject(element));
+      });
 
       setState(() {
         notes = noteData; // yeni liste sinif'a gonderilir
-
       });
-
     });
-
   }
 
+  void goToDetail(Note note) async {
+    bool result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => NoteDetail(note)));
 
+    if (result) getData();
+  }
 
-  void goToDetail(Note note) async{
-    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context)=>NoteDetail(note) ));
-
+  void goToAdd()async{
+    bool result = await Navigator.push(context,MaterialPageRoute(builder: (context)=>NoteAdd()));
     if(result) getData();
+  }
 
+  void deleteNote(Note note){
+    dbHelper.delete(note.id);
+
+    getData();
   }
 
 }
