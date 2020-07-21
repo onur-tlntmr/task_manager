@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_operations/db/DbHelper.dart';
 import 'package:flutter_crud_operations/model/Note.dart';
@@ -15,51 +13,55 @@ class NoteList extends StatefulWidget {
 }
 
 class NoteListState extends State {
-  final DbHelper dbHelper = DbHelper();
+  final DbHelper dbHelper = DbHelper(); //db operationlari icin
 
-  List<Note> notes;
+  List<Note> notes; // notlarin bulundugu yapi
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // bos ise veriler eklenir
     if (notes == null) {
       notes = List();
       getData();
     }
 
     return Scaffold(
-      body: noteListItems(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: (){
-          goToAdd();
+        body: noteListItems(), floatingActionButton: floatingActionButton());
+  }
+
+  ListView noteListItems() { //note itemler liste yapilir
+    return ListView.builder(
+        itemCount: notes.length,
+        itemBuilder: (BuildContext context, int position) {
+          return createCard(notes[position]);
+        });
+  }
+
+  Card createCard(Note note) { //note objesinden card'i olusturan method
+    return Card(
+      color: Colors.amberAccent,
+      elevation: 2,
+      child: ListTile(
+        title: Text(
+          note.title,
+          maxLines: 1, //title tek satir olmasi icin
+        ),
+        subtitle: Text(
+          note.content,
+          maxLines: 2, // en icerik en fazla iki satir olabilir
+        ),
+        onTap: () {
+          goToDetail(note); // tiklaninca noteDetail sayfasina gider
         },
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () => {deleteNote(note)}, //silme operasiyonu
+        ),
       ),
     );
   }
 
-  ListView noteListItems() {
-    return ListView.builder(
-        itemCount: notes.length,
-        itemBuilder: (BuildContext context, int position) {
-          return Card(
-            color: Colors.amberAccent,
-            elevation: 2,
-            child: ListTile(
-              title: Text(this.notes[position].title),
-              subtitle: Text(this.notes[position].content),
-              onTap: () {
-                goToDetail(this.notes[position]);
-              },
-            trailing: IconButton(icon:Icon(Icons.delete),onPressed:()=>{this.deleteNote(this.notes[position])},),
-
-            ),
-          );
-        });
-  }
-
   void getData() {
-
-    var noteFuture = dbHelper.getNotes(); //notelari future seklinde alir
+    var noteFuture =  dbHelper.getNotes(); //notelari future seklinde alir
 
     noteFuture.then((data) {
       // data list tipinde alinir
@@ -76,22 +78,31 @@ class NoteListState extends State {
     });
   }
 
-  void goToDetail(Note note) async {
+  void goToDetail(Note note) async { //detail goturen method
     bool result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => NoteDetail(note)));
+        context, MaterialPageRoute(builder: (context) => NoteDetail(note))); //note bilgisiyle donderilir
 
+    if (result) getData(); //geri gelirken guncelleme gerekiyorsa ekran guncellenir
+  }
+
+  void goToAdd() async {
+    bool result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => NoteAdd()));
     if (result) getData();
   }
 
-  void goToAdd()async{
-    bool result = await Navigator.push(context,MaterialPageRoute(builder: (context)=>NoteAdd()));
-    if(result) getData();
+  void deleteNote(Note note) async{
+    int result = await dbHelper.delete(note.id);
+    if(result == 1)
+      getData();
   }
 
-  void deleteNote(Note note){
-    dbHelper.delete(note.id);
-
-    getData();
+  FloatingActionButton floatingActionButton() {
+    return FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        goToAdd();
+      },
+    );
   }
-
 }

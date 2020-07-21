@@ -17,78 +17,81 @@ class NoteDetail extends StatefulWidget {
 class NoteDetailState extends State {
   DbHelper _dbHelper;
   Note note;
-  final TextEditingController txtController = TextEditingController();
+  final TextEditingController txtController = TextEditingController(); //content controller objesi
 
-  bool isUpdate = false;
+  bool isUpdate = false; // Yeni icerigin durumu belirten degisken
 
-  NoteDetailState(this.note);
+  NoteDetailState(this.note); // note objesi constructor ile aliniyor
 
 
   @override
-  void initState() {
-    txtController.text = note.content;
+  void initState() { //ilk olusturuldugunda
+    txtController.text = note.content; // eskinote content'in icine yazilir
+    _dbHelper = DbHelper(); //udate operasyonu icin gerekli
+    txtController.addListener(() { //content degisirse
+      note.content = txtController.text; //note objesi guncellenir
+      updateContent(); // veri tabani guncellenir
+    });
+    
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    _dbHelper = DbHelper();
 
-
-    return WillPopScope(
+    return WillPopScope( //geri gitme eventi icin gerekli
         onWillPop: () async {
-          Navigator.pop(context, isUpdate);
+          Navigator.pop(context, isUpdate); // geri gidilince guncelleme bilgiside gonderilir
           return true;
         },
         child: Scaffold(
-          resizeToAvoidBottomPadding: false,
+          resizeToAvoidBottomPadding: false, //klavye cikince ekranda tasma olmamamsi icin
           appBar: AppBar(
-            title: Text(note.title),
+            title: Text(note.title), //baslik note basligi ile guncellenir
           ),
-          body: Column(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.8,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                decoration: BoxDecoration(
-                    color: Colors.amberAccent,
-                    borderRadius: (BorderRadius.all(Radius.circular(10)))),
-                child: TextField(
-                  maxLines: null,
-                  autofocus: false,
-                  keyboardType: TextInputType.multiline,
-                  controller: txtController,
-                  decoration: InputDecoration(border: InputBorder.none),
-
-                ),
-              ),
-            ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-
-              note.content =txtController.text;
-              _dbHelper.update(note);
-              isUpdate = true;
-
-            },
-            child: Icon(Icons.update),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
+          body: detailView()
         ));
   }
 
 
+Widget detailView(){
+    return Column(
+      children: <Widget>[
+        Container(
+          width: MediaQuery.of(context).size.width, // ekranin tum genisligi alinir
+          height: MediaQuery.of(context).size.height * 0.8, //uzunlugun %80'i alinir
+          margin: EdgeInsets.all(5), //her yerden 5 margin verilir
+          decoration: BoxDecoration(
+              color: Colors.amberAccent, //rengi
+              borderRadius: (BorderRadius.all(Radius.circular(10)))),
+          child: TextField(
+            maxLines: null, //satir sayisi en buyuk olarak secilir
+            autofocus: false, // girilir girilme duzenleme acilmamasi icin
+            keyboardType: TextInputType.multiline,
+            controller: txtController, //onceki controller atanir
+            decoration: InputDecoration(border: InputBorder.none), // cerceve iptal edilri
+
+          ),
+        ),
+      ],
+    );
+}
 
 
 
+
+
+void updateContent () async{ //content i db'den guncelleyen method
+   var result =  await _dbHelper.update(note);
+
+   if(result==1) // ekleme basariliysa
+    this.isUpdate = true; // note listesine ger doner
+}
 
   @override
-  void dispose() {
-    txtController.dispose();
+  void dispose() { //life cycle'dan cikirinca
+    txtController.dispose(); // controller de cikariliyor
     super.dispose();
   }
 }

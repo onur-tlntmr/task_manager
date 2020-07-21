@@ -3,7 +3,7 @@ class Note {
   String _title;
   String _content;
 
-  Note();
+  Note(this._title);
 
   Note.withParams(this._title, this._content);
 

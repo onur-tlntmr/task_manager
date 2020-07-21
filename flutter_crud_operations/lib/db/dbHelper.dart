@@ -49,6 +49,7 @@ class DbHelper{
 
     final Database db = await this.db;
 
+
     return await db.insert(tblNote,note.toMap());
   }
 

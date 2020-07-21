@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
 
       home: Scaffold(
         appBar: AppBar(
-          title: Text("CRUD Demo"),
+          title: Text("Simple Note"),
         ),
         body: NoteList(),
       ),
