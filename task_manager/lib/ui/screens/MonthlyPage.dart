@@ -5,8 +5,10 @@ import 'package:task_manager/models/TaskGroup.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
-import 'package:task_manager/utils/Utils.dart';
 
+
+
+//Bir aylik eventleri gosteren sayfa
 class MonthlyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,11 +17,9 @@ class MonthlyPage extends StatefulWidget {
   }
 }
 
-class MonthlyState extends State<MonthlyPage> with Observer {
+class MonthlyState extends State<MonthlyPage> with Observer { //Observer page !!!!
 
-  final DataSource _dataSource = DataSource();
-  final Utils _utils = Utils();
-
+  final DataSource _dataSource = DataSource(); //Veri iletisimi icin gerekli
   Map<int, TaskGroup> _listGroup;
 
 
@@ -31,6 +31,7 @@ class MonthlyState extends State<MonthlyPage> with Observer {
     );
   }
 
+  ////////7777Observer nesne icin yonetim
   @override
   void initState() {
     super.initState();
@@ -42,15 +43,15 @@ class MonthlyState extends State<MonthlyPage> with Observer {
     super.dispose();
     _dataSource.unregister(this);
   }
+////////////////////////////////////
 
   @override
-  void update() {
-    // TODO: implement update
+  void update() { // Verilerde guncelleme olunca calisan method
 
     getListGroups();
   }
 
-  void getListGroups() {
+  void getListGroups() { //Verileri guncelleyen method
     Map<int, TaskGroup> list = Map();
 
     var taskFuture = _dataSource.getTasks();
@@ -82,12 +83,12 @@ class MonthlyState extends State<MonthlyPage> with Observer {
 
       });
 
-    setState(() {
+    setState(() { //State tetiklendi
       _listGroup = list;
     });
   }
 
-  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) {
+  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) { //TaskGrup widget olsuturuldu
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
@@ -97,9 +98,9 @@ class MonthlyState extends State<MonthlyPage> with Observer {
   }
 
   ListView createListView() {
-    if (_listGroup == null) getListGroups();
+    if (_listGroup == null) getListGroups(); //eger collection bos ise doldur
 
-    return ListView.builder(
+    return ListView.builder( //Colection'daki verilere gore listView olusturur
         itemCount: _listGroup.length,
         itemBuilder: (BuildContext context, int position) {
 

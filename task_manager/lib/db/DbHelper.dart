@@ -46,6 +46,8 @@ class DbHelper {
   }
 
 
+  /*Crud Operations*/
+
   Future<int> insert(Task task) async {
     final Database db = await this.db;
 
@@ -59,7 +61,6 @@ class DbHelper {
 
     var result = db.update(
         tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
-    print("Update: Title: ${task.title}");
     return result;
   }
 
@@ -67,10 +68,7 @@ class DbHelper {
   Future<int> delete(int id) async {
     final Database db = await this.db;
 
-
     var result = db.delete(tblTask, where: "$colId=?", whereArgs: [id]);
-
-    print("Delete");
 
     return result;
   }
@@ -90,12 +88,7 @@ class DbHelper {
     return result;
   }
 
-  Future<List> getTaskByDayStr() async{
-    final Database db = await this.db;
 
-
-
-  }
 
 
 }

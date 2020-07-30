@@ -6,6 +6,8 @@ import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
 import 'package:task_manager/utils/Utils.dart';
 
+//Gunluk tasklari gosteren sayfa
+
 class DailyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -14,23 +16,24 @@ class DailyPage extends StatefulWidget {
     return DailyState();
   }
 }
-
 class DailyState extends State with Observer {
-  final DataSource _dataSource = DataSource();
 
-  final Utils _utils = Utils();
+  final DataSource _dataSource = DataSource(); //Data islemleri icin gerekli
+
+  final Utils _utils = Utils(); //Bazi tarih formatlamalari icin gerekli
 
   List<Task> list;
 
   var current = DateTime.now();
 
-  var w, h;
+  var w, h; // Ekran genisligi ve yuksekligini verir
 
   Timer _timer;
 
   @override
   Widget build(BuildContext context) {
-    calculateScreenSize(context);
+
+    calculateScreenSize(context); // Ekran boyutlarini hesaplar
 
     return Container(
       child:Column(
@@ -47,13 +50,21 @@ class DailyState extends State with Observer {
   }
 
   @override
-  void initState() {
+  void initState() { //State yonetimi basladiginda
     super.initState();
-    _startTimer();
-    _dataSource.register(this);
+    _startTimer(); //Clock Timer'i baslatir
+    _dataSource.register(this); // Observer olarak kendini ekler
   }
 
-  void _startTimer() {
+  //Disopse edilince ise timer cikarilir
+  @override
+  void dispose() {
+    super.dispose();
+    _timer.cancel();
+    _dataSource.unregister(this); // Artik ekranda render yapilamacagi icin observerList'ten cikarilir
+  }
+
+  void _startTimer() { //Her saniyde saat'e bir saniye ekler
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         current = current.add(const Duration(seconds: 1));
@@ -61,12 +72,12 @@ class DailyState extends State with Observer {
     });
   }
 
-  void calculateScreenSize(BuildContext context) {
+  void calculateScreenSize(BuildContext context) { //Farkli cozunurlukerde reusable olmasi icin gerkekli
     w = MediaQuery.of(context).size.width;
     h = MediaQuery.of(context).size.height;
   }
 
-  Widget createCard(Task task) {
+  Widget createCard(Task task) { //Verilen task objesinden car olusturur
     return TaskCardWidget(
       task: task,
       onUpdate: () {
@@ -75,16 +86,11 @@ class DailyState extends State with Observer {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _timer.cancel();
-    _dataSource.unregister(this);
-  }
 
-  ListView createListView() {
 
-    if(list == null)
+  ListView createListView() { //Kartlardan listView olsuturur
+
+    if(list == null) //eger liste bos ise doldurulur
       getData();
 
     return ListView.builder(
@@ -94,7 +100,7 @@ class DailyState extends State with Observer {
         });
   }
 
-  void getData() {
+  void getData() { //task listesini olsuturur
     var taskFuture = _dataSource.getTasks();
 
     List<Task> dataTask = List();
@@ -110,7 +116,7 @@ class DailyState extends State with Observer {
     });
   }
 
-  Widget dateWidget() {
+  Widget dateWidget() { //Ekranda tarih ve saat gosteren widget
     DateTime dateTime = DateTime.now();
 
     return Column(
@@ -126,8 +132,7 @@ class DailyState extends State with Observer {
   }
 
   @override
-  void update() {
-    // TODO: implement update
+  void update() { //Datalarda herhangi bir degisiklik oldugunda sayfayi guncller
     getData();
   }
 }

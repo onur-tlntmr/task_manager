@@ -41,10 +41,6 @@ class Utils{
 
   }
 
-  String getLocalDayMonth(DateTime dateTime){
-    var result = toDoubleDigit(dateTime.day)+"  "+DateFormat.MMMd("tr_TR").format(dateTime);
 
-    return result;
-  }
 
 }

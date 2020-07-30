@@ -16,29 +16,26 @@ class MainPage extends StatefulWidget {
 }
 
 class MainState extends State {
-  int pageCount = 3;
-  final double _iconSize = 10;
-  var h, w;
+  int pageCount = 3; //Kaydirilabilen sayfa sayisi
+
+  final double _iconSize = 10; //Allttaki indicator'in boyutu
+
+  var h, w; //ekran cozunurlukleri
 
   final DataSource dataSource = new DataSource();
 
+  var _dotColors = <Color>[ //indicators renklerini tutan degisken
+    Colors.blue,
+    Colors.black45,
+    Colors.black45,
+  ];
+
+//Bu servis notlarin takibini yapar ornegin: olsturulan task tamamlanmamis ise onu tamamlanmamis olarak isaretler
   DataUpdaterService service = DataUpdaterService();
 
-  void init() {
-    service.startService();
-  }
 
-  @override
-  void dispose() {
-    super.dispose();
-    service.closeService();
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    init();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +48,7 @@ class MainState extends State {
       body: Column(
         children: <Widget>[
           Container(
-            height: h * 0.85,
+            height: h * 0.85, //boyutlar yuzdesel olarak verilir
             margin: EdgeInsets.only(top: h * 0.05),
             child: PageView(
               scrollDirection: Axis.horizontal,
@@ -70,63 +67,77 @@ class MainState extends State {
           Container(
             height: h * 0.03,
             margin: EdgeInsets.only(bottom: h * 0.013),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.lens, color: _dotColors[0]),
-                  iconSize: _iconSize,
-                ),
-                IconButton(
-                  icon: Icon(Icons.lens, color: _dotColors[1]),
-                  iconSize: _iconSize,
-                ),
-                IconButton(
-                  icon: Icon(Icons.lens, color: _dotColors[2]),
-                  iconSize: _iconSize,
-                ),
-              ],
-            ),
+            child: createIndicator(),
           )
         ],
       ),
-      floatingActionButton: Container(
-        height: h * 0.08,
-        width: h * 0.08,
-        child: actionButton(context),
-      ),
+      floatingActionButton: actionButton(context),
     );
   }
 
-  var _dotColors = <Color>[
-    Colors.blue,
-    Colors.black45,
-    Colors.black45,
-  ];
-
-  void changeColor(int index) {
-    for (int i = 0; i < pageCount; i++) {
-      if (i == index)
-        _dotColors[i] = Colors.blue;
-      else
-        _dotColors[i] = Colors.black45;
-    }
+  @override
+  void initState() { //State baslandiginda
+    super.initState();
+    service.startService(); //servis baslatilir
   }
 
-  void goToAdd(BuildContext context) async {
+  @override
+  void dispose() {
+    super.dispose();
+    service.closeService(); //dispose edildiginde servics kapatilir
+  }
+
+
+  Widget createIndicator(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.lens, color: _dotColors[0]),
+          iconSize: _iconSize,
+        ),
+        IconButton(
+          icon: Icon(Icons.lens, color: _dotColors[1]),
+          iconSize: _iconSize,
+        ),
+        IconButton(
+          icon: Icon(Icons.lens, color: _dotColors[2]),
+          iconSize: _iconSize,
+        ),
+      ],
+    );
+  }
+
+
+  void changeColor(int index) { //Secilen page'a gore alttaki noktalarin rengi degistirilir
+
+    for (int i = 0; i < pageCount; i++) {
+      if (i == index)  //Secili olan mavi yapilir
+        _dotColors[i] = Colors.blue;
+      else //Kalanlar ise siyah yapilir
+        _dotColors[i] = Colors.black45;
+    }
+
+  }
+
+  void goToAdd(BuildContext context) async { //Task ekleme ekranina giden method
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddPage()));
   }
 
-  FloatingActionButton actionButton(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: Colors.white,
-      child: IconButton(
-        icon: Icon(Icons.add),
+  Widget actionButton(BuildContext context) { //AcionButton olusturan method
+    return Container(
+      height: h * 0.08,
+      width: h * 0.08,
+      child: FloatingActionButton(
+        backgroundColor: Colors.white,
+        child: IconButton(
+          icon: Icon(Icons.add),
+        ),
+        onPressed: () {
+          goToAdd(context);
+        },
       ),
-      onPressed: () {
-        goToAdd(context);
-      },
-    );
+    ) ;
   }
 }

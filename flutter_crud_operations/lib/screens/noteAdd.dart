@@ -101,13 +101,7 @@ class NoteAddState extends State {
 
     if (result != 1)
       this.isInsert = true;
-
-
   }
-
-
-
-
 
 
 

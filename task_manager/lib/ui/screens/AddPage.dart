@@ -23,11 +23,12 @@ class AddPageState extends State {
 
   bool isSave = false; //kayit islemi yapilip yapilmadigini gosteren method
 
+  //Task zamanlarini tuttan degiskenler
   DateTime _finisDate;
   DateTime _beginDate;
 
+  //Slider'daki degerler
   double _hourValue = 0;
-
   double _minuteValue = 0;
 
 

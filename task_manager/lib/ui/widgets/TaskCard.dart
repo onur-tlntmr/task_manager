@@ -3,11 +3,13 @@ import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/utils/Utils.dart';
 
+//TaskCarWidget tasklari gosterir
+
 class TaskCardWidget extends StatefulWidget{
 
-  final Task task;
-//  final Utils utils;
-  final Function onUpdate;
+  final Task task; //Task nesnesi
+
+  final Function onUpdate; //Herhangi bir evente tetiklenecek method
 
   const TaskCardWidget({@required this.task, this.onUpdate});
 
@@ -20,19 +22,19 @@ class TaskCardWidget extends StatefulWidget{
 
 class _TaskCardState extends State<TaskCardWidget>{
 
-  Map<String,IconData> iconMap = {
+  Map<String,IconData> iconMap = { //Duruma gore secilecek iconllar
     'waiting':Icons.access_time,
     'incomplete':Icons.cancel,
     'complete':Icons.check
   };
 
-  final Utils _utils = Utils();
-  final DataSource _dataSource = DataSource();
+  final Utils _utils = Utils(); //Saat tarih icin gerekli
+  final DataSource _dataSource = DataSource(); //Eventler icin gerekli
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
 
+    //Ust siniftaki variable'lar aliniyor
     Task task = widget.task;
 
     var _beginDate = _utils.dateFormatter(task.beginDate);
@@ -65,10 +67,7 @@ class _TaskCardState extends State<TaskCardWidget>{
   void deleteTask(Task task)async{
 
     await  _dataSource.delete(task);
-
     widget.onUpdate();
-
-
   }
 
   void checkedTask(Task task){

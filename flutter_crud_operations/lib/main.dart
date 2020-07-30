@@ -10,21 +10,46 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
+  NoteList noteList;
+
   @override
   Widget build(BuildContext context) {
 
+
+    noteList = NoteList();
+
+
+
     return MaterialApp(
-      title: "CRUD Demo",
+      title: "Simpe Note",
 
       home: Scaffold(
         appBar: AppBar(
           title: Text("Simple Note"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: (){
+
+              },
+            )
+          ],
+
         ),
-        body: NoteList(),
+
+
+        body: noteList,
       ),
 
     );
   }
+
+//  void goToAdd(BuildContext context) async {
+//    bool result = await Navigator.push(
+//        context, MaterialPageRoute(builder: (context) => NoteAdd()));
+//    if (result) getData();
+//  }
+
 }
 
 

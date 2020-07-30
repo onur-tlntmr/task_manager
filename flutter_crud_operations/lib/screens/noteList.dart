@@ -22,9 +22,9 @@ class NoteListState extends State {
     if (notes == null) {
       notes = List();
       getData();
-    }
+        }
 
-    return Scaffold(
+  return Scaffold(
         body: noteListItems(), floatingActionButton: floatingActionButton());
   }
 

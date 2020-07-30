@@ -30,11 +30,9 @@ class GroupListState extends State<TaskGroupWidget>{
   @override
   Widget build(BuildContext context) {
 
-    h = MediaQuery.of(context).size.height;
+    h = MediaQuery.of(context).size.height; //ekranin boyu alinir
 
-    print("Gün ${widget.taskGroup.title}");
-
-    taskList  = widget.taskGroup.taskList;
+    taskList  = widget.taskGroup.taskList; //tasklarin listesi
 
     return Column(
       children: <Widget>[
@@ -45,7 +43,7 @@ class GroupListState extends State<TaskGroupWidget>{
   }
 
 
-  Widget createHeader(){
+  Widget createHeader(){ //TaskGroup'un basligini olsuturan method
     return
       Container(
         alignment: Alignment.centerLeft,
@@ -56,12 +54,12 @@ class GroupListState extends State<TaskGroupWidget>{
       );
   }
 
-  Widget createListView() {
+  Widget createListView() { //Tasklari listView'a ceviren method
 
     return ListView.builder(
         scrollDirection: Axis.vertical,
-        physics: ClampingScrollPhysics(),
-        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),//Grouplar kendi aralarinda scroll edilmemesi icin gerekli
+        shrinkWrap: true, //Nested listview kullanmak icin gerekli
         itemCount: taskList.length,
         itemBuilder: (BuildContext context, int position) {
           return TaskCardWidget(task: taskList[position],onUpdate: widget.onUpdate,);
