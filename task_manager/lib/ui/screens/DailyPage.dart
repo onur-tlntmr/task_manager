@@ -105,9 +105,14 @@ class DailyState extends State with Observer {
 
     List<Task> dataTask = List();
 
+    DateTime current = DateTime.now(); //Simdiki zaman seciliyor
+
     taskFuture.then((data) {
-      data.forEach((element) {
-        dataTask.add(Task.fromObject(element));
+      data.forEach((element) { //elemanlar arasindan geziliyor
+
+        Task task = Task.fromObject(element);
+        if(task.beginDate.day == current.day) //task'in gunu simdiki gun ise
+          dataTask.add(task); //task ekeleniyor
       });
     });
 
