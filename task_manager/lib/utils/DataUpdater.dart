@@ -37,7 +37,7 @@ class DataUpdaterService extends Observer {
   }
 
   _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) { //Her 15 saniyede bir calisan timer
+    _timer = Timer.periodic(const Duration(seconds: 15), (timer) { //Her 15 saniyede bir calisan timer
 
       getList();
 
