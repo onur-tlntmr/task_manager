@@ -76,7 +76,6 @@ class MonthlyState extends State<MonthlyPage> with Observer { //Observer page !!
           }
             list[day].taskList.add(task); //kendi grubuna eklendi
 
-          print("$task");
 
         });
 
