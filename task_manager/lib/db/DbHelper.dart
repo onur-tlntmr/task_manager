@@ -20,16 +20,17 @@ class DbHelper {
   final String colStatus = "Status";
 
   static final DbHelper _dbHelper = DbHelper._internal(); // singleton object
-  static Database _db; // db objesi
 
-  DbHelper._internal(); // default constructor
+  static Database _db ; // db objesi
+
+  DbHelper._internal();// default constructor
 
   factory DbHelper(){
     return _dbHelper; // surekli ayni instace'i donderir
   }
 
 
-  Future<Database> get db async { //singleton db objesi olusturur
+  Future<Database> get db async { //singleton db objesi donderir
     if (_db == null)
       _db = await initializeDb();
     return _db;
@@ -58,15 +59,17 @@ class DbHelper {
 * */
 
   Future<int> insert(Task task) async { //Database'e task objesini ekler ve operasyon kodunu donderir
-
-    return await _db.insert(tblTask, task.toMap()); //param1: tablo adi, param2: task verileri
+    final Database database = await db;
+    return await database.insert(tblTask, task.toMap()); //param1: tablo adi, param2: task verileri
   }
 
 
   Future<int> update(Task task) async { //Parametre olarak aldigi task'i guncelleyen method
 
+    final Database database = await db;
 
-    var result = _db.update(
+
+    var result = database.update(
         tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
 
     return result; //Operation sonucunu donderir
@@ -75,7 +78,10 @@ class DbHelper {
 
   Future<int> delete(int id) async { //Id'si verilen taski siler
 
-    var result = _db.delete(tblTask, where: "$colId=?", whereArgs: [id]);
+    final Database database = await db;
+
+
+    var result = database.delete(tblTask, where: "$colId=?", whereArgs: [id]);
 
     return result;//Operation sonucunu donerir
   }
@@ -84,7 +90,10 @@ class DbHelper {
 
   Future<List> getTasks() async { //Tum tasklari  geri donduren method
 
-    List result = await _db.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
+    final Database database = await db;
+
+
+    List result = await database.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
     return result;  //Operation sonucunu donderir
   }
 
