@@ -1,3 +1,10 @@
+/*
+* Task model'i
+*
+* */
+
+
+
 class Task {
   int _id;
   String _title;
@@ -6,9 +13,9 @@ class Task {
   String _status;
 
 
-  Task();
+  Task(); //Default constructor
 
-  Task.wihtParams(
+  Task.wihtParams( //Parametreli constructor
       this._title, this._beginDate, this._finishedDate, this._status);
 
   int get id => _id;
@@ -41,7 +48,7 @@ class Task {
     _status = value;
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() { //Task'i map halinde donderir
     var map = Map<String, dynamic>();
 
     map["id"] = _id;
@@ -53,8 +60,8 @@ class Task {
     return map;
   }
 
-  Task.fromObject(dynamic o) {
-    this._id = o["Id"];
+  Task.fromObject(dynamic o) { //Farkli tipte gelen verilerden task olsuturan constructor
+    this._id = o["Id"];        //Ornek olarak yukardaki map gibi
     this._title = o["Title"];
     this._status = o["Status"];
     this._beginDate = DateTime.parse(o["BeginDate"]);
