@@ -4,8 +4,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:task_manager/models/Task.dart';
 
+/*
+* Database crud operasyonlarindan sorumlu sinif
+* Bu sinif singleton olup tum methodlari async olarak yazilmistir
+*
+* */
+
 class DbHelper {
-  final String tblTask = "Tasks";
+  final String tblTask = "Tasks"; //Task adi
+  //Kolonlarin adi
   final String colId = "Id";
   final String colTitle = "Title";
   final String colBeginDate = "BeginDate";
@@ -22,16 +29,14 @@ class DbHelper {
   }
 
 
-  Future<Database> get db async {
+  Future<Database> get db async { //singleton db objesi olusturur
     if (_db == null)
       _db = await initializeDb();
-
     return _db;
   }
 
 
-  Future<Database> initializeDb() async {
-    // baglanti saylayan method
+  Future<Database> initializeDb() async { //DB baglantisini yapan ve donduren method
     Directory directory = await getApplicationDocumentsDirectory();
 
     String path = directory.path + "tasks.db";
@@ -45,47 +50,42 @@ class DbHelper {
             "$colFinishedDate TEXT, $colStatus TEXT )");
   }
 
+/*
+* Bazi crud operation'lar yapilan isleme bagli olarak sonuc donderir
+*
+* Result olarak 1 donmesi islemin hatali sonuclandigini gosterir
+*
+* */
 
-  /*Crud Operations*/
+  Future<int> insert(Task task) async { //Database'e task objesini ekler ve operasyon kodunu donderir
 
-  Future<int> insert(Task task) async {
-    final Database db = await this.db;
-
-
-    return await db.insert(tblTask, task.toMap());
+    return await _db.insert(tblTask, task.toMap()); //param1: tablo adi, param2: task verileri
   }
 
 
-  Future<int> update(Task task) async {
-    final Database db = await this.db;
+  Future<int> update(Task task) async { //Parametre olarak aldigi task'i guncelleyen method
 
-    var result = db.update(
+
+    var result = _db.update(
         tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
-    return result;
+
+    return result; //Operation sonucunu donderir
   }
 
 
-  Future<int> delete(int id) async {
-    final Database db = await this.db;
+  Future<int> delete(int id) async { //Id'si verilen taski siler
 
-    var result = db.delete(tblTask, where: "$colId=?", whereArgs: [id]);
+    var result = _db.delete(tblTask, where: "$colId=?", whereArgs: [id]);
 
-    return result;
+    return result;//Operation sonucunu donerir
   }
 
 
-  void clearDb()async{
-    final Database db = await this.db;
 
-    db.delete(tblTask);
+  Future<List> getTasks() async { //Tum tasklari  geri donduren method
 
-  }
-
-  Future<List> getTasks() async {
-    final Database db = await this.db;
-
-    List result = await db.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate");
-    return result;
+    List result = await _db.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
+    return result;  //Operation sonucunu donderir
   }
 
 
