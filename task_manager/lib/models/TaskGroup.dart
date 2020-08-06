@@ -1,5 +1,11 @@
 import 'Task.dart';
 
+/*
+*TaskGroupWidget icin viewModel
+* İcerisinde title ve tasklarin buludu collection yer alir
+*
+* */
+
 class TaskGroup{
   List<Task> _taskList;
 
