@@ -68,7 +68,6 @@ class DbHelper {
 
     final Database database = await db;
 
-
     var result = database.update(
         tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
 
@@ -80,7 +79,6 @@ class DbHelper {
 
     final Database database = await db;
 
-
     var result = database.delete(tblTask, where: "$colId=?", whereArgs: [id]);
 
     return result;//Operation sonucunu donerir
@@ -91,7 +89,6 @@ class DbHelper {
   Future<List> getTasks() async { //Tum tasklari  geri donduren method
 
     final Database database = await db;
-
 
     List result = await database.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
     return result;  //Operation sonucunu donderir
