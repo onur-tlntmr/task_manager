@@ -6,20 +6,22 @@ import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
 
+
+
 //Bir aylik eventleri gosteren sayfa
-class MonthlyPage extends StatefulWidget {
+class AllPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return MonthlyState();
+    return AllState();
   }
 }
 
-class MonthlyState extends State<MonthlyPage> with Observer {
-  //Observer page !!!!
+class AllState extends State<AllPage> with Observer { //Observer page !!!!
 
   final DataSource _dataSource = DataSource(); //Veri iletisimi icin gerekli
   Map<int, TaskGroup> _listGroup;
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class MonthlyState extends State<MonthlyPage> with Observer {
     );
   }
 
-  ////////7777Observer nesne icin yonetim
+  ////////Observer nesne icin yonetim
   @override
   void initState() {
     super.initState();
@@ -41,65 +43,51 @@ class MonthlyState extends State<MonthlyPage> with Observer {
     super.dispose();
     _dataSource.unregister(this);
   }
-
 ////////////////////////////////////
 
   @override
-  void update() {
-    // Verilerde guncelleme olunca calisan method
+  void update() { // Verilerde guncelleme olunca calisan method
 
     getListGroups();
   }
 
-  void getListGroups() {
-    //Verileri guncelleyen method
+  void getListGroups() { //Verileri guncelleyen method
     Map<int, TaskGroup> list = Map();
 
     var taskFuture = _dataSource.getTasks();
 
-    taskFuture.then((data) {
-      //db'den future olarak veriler alindi
 
-      data.forEach((element) {
-        // tum veriler gezildi
-        Task task =
-            Task.fromObject(element); //alinan veri task obj donusturuldu
 
-        DateTime beginDate = task.beginDate;
+      taskFuture.then((data){ //db'den future olarak veriler alindi
 
-        DateTime current = DateTime.now();
+        data.forEach((element) { // tum veriler gezildi
+          Task task = Task.fromObject(element); //alinan veri task obj donusturuldu
 
-        DateTime afterOneMonth =
-            current.add(new Duration(days: 30)); //Bir ay sonrasi
+          int day = task.beginDate.day; // gun alindi
 
-        int beginDay; //baslangic gunu
 
-        //İslem sonraki bir aylik zaman dilimi icersinde ise
-        if (beginDate.isBefore(afterOneMonth) && current.isBefore(beginDate)) {
-          beginDay = beginDate.day;
 
-          if (!list.containsKey(beginDay)) {
-            // daha once gun yoksa collection'da olusturuldu
+          if(!list.containsKey(day)) { // daha once gun yoksa collection'da olusturuldu
 
             TaskGroup taskGroup = TaskGroup();
             taskGroup.title = DateFormat.MMMd("tr_TR").format(task.beginDate);
 
-            list.putIfAbsent(beginDay, () => taskGroup);
+            list.putIfAbsent(day, () => taskGroup);
           }
+            list[day].taskList.add(task); //kendi grubuna eklendi
 
-          list[beginDay].taskList.add(task); //kendi grubuna eklendi
-        }
+
+        });
+
+
       });
-    });
 
-    setState(() {
-      //State tetiklendi
+    setState(() { //State tetiklendi
       _listGroup = list;
     });
   }
 
-  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) {
-    //TaskGrup widget olsuturuldu
+  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) { //TaskGrup widget olsuturuldu
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
@@ -111,10 +99,10 @@ class MonthlyState extends State<MonthlyPage> with Observer {
   ListView createListView() {
     if (_listGroup == null) getListGroups(); //eger collection bos ise doldur
 
-    return ListView.builder(
-        //Colection'daki verilere gore listView olusturur
+    return ListView.builder( //Colection'daki verilere gore listView olusturur
         itemCount: _listGroup.length,
         itemBuilder: (BuildContext context, int position) {
+
           //map'a index uzerinden erisebilmek icin anahtarlari listeye donusturuyoruz
           List keys = _listGroup.keys.toList();
 

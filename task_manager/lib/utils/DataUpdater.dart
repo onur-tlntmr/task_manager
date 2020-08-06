@@ -37,7 +37,7 @@ class DataUpdaterService extends Observer {
   }
 
   _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 15), (timer) { //Her 15 saniyede bir calisan timer
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) { //Her 15 saniyede bir calisan timer
 
       getList();
 
@@ -45,7 +45,7 @@ class DataUpdaterService extends Observer {
 
       taskList.forEach((element) { //Her task geziliyor
         if (current.isAfter(element.finishedDate) && //eger task bitmis ise ve
-            element.status == "waiting") { //hala bekliyor konumda ise
+            element.status == "waiting" || element.status == "running") { //hala bekliyor konumda ise
           element.status = "incomplete"; //tamamlanmamis olarak guncelle
 
           _dataSource.update(element); //update'i veri tabanina yansit

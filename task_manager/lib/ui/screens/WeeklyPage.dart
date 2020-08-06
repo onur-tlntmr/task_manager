@@ -15,7 +15,6 @@ class WeeklyPage extends StatefulWidget {
 }
 
 class WeeklyState extends State<WeeklyPage> with Observer {
-
   final DataSource _dataSource = DataSource();
   final Utils _utils = Utils();
 
@@ -53,40 +52,46 @@ class WeeklyState extends State<WeeklyPage> with Observer {
 
     var taskFuture = _dataSource.getTasks();
 
+    taskFuture.then((data) {
+      //tasklari future olarak veritabanindan al
+      data.forEach((element) {
+        //icindeki her bir datayi kullan
+        Task t = Task.fromObject(element); // datayi task'a donustur
+        DateTime beginDate = t.beginDate; //Baslangic zamani
+        DateTime current = DateTime.now(); //simdiki zaman
+        DateTime afterOneWeek =
+            current.add(Duration(days: 7)); //Bir hafta sonrasini hesaplar
 
+        String title; //Group basligi
 
-      taskFuture.then((data) {
-        //tasklari future olarak veritabanindan al
-        data.forEach((element) {
-          //icindeki her bir datayi kullan
-          Task t = Task.fromObject(element); // datayi task'a donustur
-          DateTime dateTime = t.beginDate;
-          String day = _utils.getLocalDay(dateTime);
+        if (current.day == beginDate.day)
+          title = "Bugün";
+        else if (beginDate.day - current.day == 1)
+          title = "Yarın";
+        else
+          title = _utils.getLocalDay(beginDate);
+        //eger aranan gun ise ve en fazla bir hafta sonranin ise
+        if (beginDate.isBefore(afterOneWeek) && current.isBefore(beginDate)) {
+          TaskGroup taskGroup = TaskGroup(); // Yeni bir taskGroup olusturuluyor
+          taskGroup.title = title; //Basligina gun'u veriyoruz
 
-          DateTime afterOneWeek = DateTime.now().add(Duration(days: 7)); //Bir hafta sonrasini hesaplar
+          if (!list.containsKey(title)) // gun ekli degilse
+            list.putIfAbsent(title, () => taskGroup); //ekle
 
-          //eger aranan gun ise ve en fazla bir hafta sonranin ise
-          if (dateTime.isBefore(afterOneWeek)) {
+          list[title].taskList.add(t); //task listesine de ekele
 
-            TaskGroup taskGroup = TaskGroup(); // Yeni bir taskGroup olusturuluyor
-            taskGroup.title = day; //Basligina gun'u veriyoruz
-
-            if (!list.containsKey(day)) // gun ekli degilse
-              list.putIfAbsent(day, () => taskGroup); //ekle
-
-
-            list[day].taskList.add(t); //task listesine de ekele
-          }
-
+        }
       });
     });
 
-    setState(() {//state tetikleniyor
+    setState(() {
+      //state tetikleniyor
       _listGroup = list;
     });
   }
 
-  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) { //TaskGroup objesinden Widget olusturan method
+  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) {
+    //TaskGroup objesinden Widget olusturan method
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
@@ -95,19 +100,20 @@ class WeeklyState extends State<WeeklyPage> with Observer {
     );
   }
 
-  ListView createListView() { //listGroup'lardan bir liste olusturur
+  ListView createListView() {
+    //listGroup'lardan bir liste olusturur
     if (_listGroup == null) getListGroups(); // veri yoksa getirilir
 
     return ListView.builder(
         itemCount: _listGroup.length,
         itemBuilder: (BuildContext context, int position) {
-
           //map'a index uzerinden erisebilmek icin anahtarlari listeye donusturuyoruz
           List keys = _listGroup.keys.toList();
 
           String title = keys[position]; //positiondaki anahtar aliniyor
 
-          return createTaskGroupWidget(_listGroup[title]); //TaskGroupWidget'i olsturuluyor
+          return createTaskGroupWidget(
+              _listGroup[title]); //TaskGroupWidget'i olsturuluyor
         });
   }
 }

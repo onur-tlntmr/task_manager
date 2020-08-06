@@ -5,7 +5,7 @@ import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
 import 'package:task_manager/utils/Utils.dart';
-
+import 'dart:developer' as developer;
 //Gunluk tasklari gosteren sayfa
 
 class DailyPage extends StatefulWidget {

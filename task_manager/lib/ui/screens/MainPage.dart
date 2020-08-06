@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:task_manager/ui/screens/AddPage.dart';
+import 'package:task_manager/ui/screens/AllPage.dart';
 import 'package:task_manager/ui/screens/DailyPage.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/ui/screens/MonthlyPage.dart';
@@ -16,24 +17,20 @@ class MainPage extends StatefulWidget {
 }
 
 class MainState extends State {
-  int pageCount = 3; //Kaydirilabilen sayfa sayisi
-
   final double _iconSize = 10; //Allttaki indicator'in boyutu
+
+  final int pageCount = 4; // Page sayisi
 
   var h, w; //ekran cozunurlukleri
 
   final DataSource dataSource = new DataSource();
 
-  var _dotColors = <Color>[ //indicators renklerini tutan degisken
-    Colors.blue,
-    Colors.black45,
-    Colors.black45,
-  ];
+  List<Color> _dotColors = List(); //nokta renkleri
+
+  PageController _pageController; //page uzerinde islem yapmak icin gerekli
 
 //Bu servis notlarin takibini yapar ornegin: olsturulan task tamamlanmamis ise onu tamamlanmamis olarak isaretler
   DataUpdaterService service = DataUpdaterService();
-
-
 
 
 
@@ -44,6 +41,8 @@ class MainState extends State {
 
     h = MediaQuery.of(context).size.height;
 
+    initDotColors();
+
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -51,16 +50,18 @@ class MainState extends State {
             height: h * 0.85, //boyutlar yuzdesel olarak verilir
             margin: EdgeInsets.only(top: h * 0.05),
             child: PageView(
+              controller: _pageController,
               scrollDirection: Axis.horizontal,
               onPageChanged: (index) {
                 setState(() {
                   changeColor(index);
                 });
               },
-              children: <Widget>[
+              children: <Widget>[ //Pages
                 DailyPage(),
                 WeeklyPage(),
-                MonthlyPage()
+                MonthlyPage(),
+                AllPage()
               ],
             ),
           ),
@@ -76,56 +77,67 @@ class MainState extends State {
   }
 
   @override
-  void initState() { //State baslandiginda
+  void initState() {
+    //State baslandiginda
     super.initState();
     service.startService(); //servis baslatilir
+    _pageController = PageController(initialPage: 0);
   }
 
   @override
   void dispose() {
     super.dispose();
     service.closeService(); //dispose edildiginde servics kapatilir
+    _pageController.dispose();
   }
 
+  void initDotColors() {
+    if (pageCount > 0) {
+      _dotColors.add(Colors.blueAccent);
 
-  Widget createIndicator(){
+      for (int i = 1; i < pageCount; i++) {
+        _dotColors.add(Colors.black45);
+      }
+    }
+  }
+
+  Widget createIndicator() {
+    List<Widget> childs = List();
+
+    for (int i = 0; i < pageCount; i++) {
+      childs.add(IconButton(
+        icon: Icon(Icons.lens, color: _dotColors[i]),
+        iconSize: _iconSize,onPressed: (){ //Her bir noktaya basildiginda o'nun oldugu sayfaya gider
+          _pageController.animateToPage(i, duration: Duration(milliseconds: 350), curve: Curves.bounceInOut);
+      },
+      ));
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.lens, color: _dotColors[0]),
-          iconSize: _iconSize,
-        ),
-        IconButton(
-          icon: Icon(Icons.lens, color: _dotColors[1]),
-          iconSize: _iconSize,
-        ),
-        IconButton(
-          icon: Icon(Icons.lens, color: _dotColors[2]),
-          iconSize: _iconSize,
-        ),
-      ],
+      children: childs,
     );
   }
 
+  void changeColor(int index) {
+    //Secilen page'a gore alttaki noktalarin rengi degistirilir
 
-  void changeColor(int index) { //Secilen page'a gore alttaki noktalarin rengi degistirilir
-
-    for (int i = 0; i < pageCount; i++) {
-      if (i == index)  //Secili olan mavi yapilir
-        _dotColors[i] = Colors.blue;
+    for (int i = 0; i < _dotColors.length; i++) {
+      if (i == index) //Secili olan mavi yapilir
+        _dotColors[i] = Colors.blueAccent;
       else //Kalanlar ise siyah yapilir
         _dotColors[i] = Colors.black45;
     }
-
   }
 
-  void goToAdd(BuildContext context) async { //Task ekleme ekranina giden method
+  void goToAdd(BuildContext context) async {
+    //Task ekleme ekranina giden method
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddPage()));
   }
 
-  Widget actionButton(BuildContext context) { //AcionButton olusturan method
+  Widget actionButton(BuildContext context) {
+    //AcionButton olusturan method
     return Container(
       height: h * 0.08,
       width: h * 0.08,
@@ -138,6 +150,6 @@ class MainState extends State {
           goToAdd(context);
         },
       ),
-    ) ;
+    );
   }
 }

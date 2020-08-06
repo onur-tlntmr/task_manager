@@ -196,7 +196,6 @@ class AddPageState extends State {
   @override
   void dispose() { //ui dispose edildiginde controller nesnesi de dispose ediliyor
     super.dispose();
-
     _txtController.dispose();
   }
 
@@ -204,10 +203,18 @@ class AddPageState extends State {
 
     Task task = new Task();
 
+    DateTime current = DateTime.now();
+
+
     task.title = _txtController.text;
     task.beginDate = _beginDate;
     task.finishedDate = _finisDate;
-    task.status = "waiting";
+
+    if(task.beginDate.isAfter(current)) //Eger simdiki zamandan sonra islenecek ise
+      task.status = "waiting";
+
+    else
+      task.status = "running";
 
     return task;
 
@@ -263,6 +270,7 @@ class AddPageState extends State {
 
 
   void insertTask(Task task) async{ // DB'ye task ekliyen method
+
 
     var result = await _dataSource.insert(task); //datayi ekler
 
