@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-class Utils{
+class DateUtils{
 
   String toDoubleDigit(int x){
 

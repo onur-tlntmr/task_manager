@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/source/DataSource.dart';
-import 'package:task_manager/utils/Utils.dart';
+import 'package:task_manager/utils/DateUtils.dart';
 
 //TaskCarWidget tasklari gosterir
 
@@ -27,7 +27,7 @@ class _TaskCardState extends State<TaskCardWidget> {
     'running': Icons.play_circle_outline
   };
 
-  final Utils _utils = Utils(); //Saat tarih icin gerekli
+  final DateUtils _utils = DateUtils(); //Saat tarih icin gerekli
   final DataSource _dataSource = DataSource(); //Eventler icin gerekli
 
 

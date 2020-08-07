@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:intl/intl.dart';
 import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
@@ -37,7 +36,7 @@ class DataUpdaterService extends Observer {
   }
 
   _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) { //Her 15 saniyede bir calisan timer
+    _timer = Timer.periodic(const Duration(seconds: 15), (timer) { //Her 15 saniyede bir calisan timer
 
       getList();
 
