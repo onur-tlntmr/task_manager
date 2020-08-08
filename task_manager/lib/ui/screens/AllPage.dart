@@ -7,8 +7,7 @@ import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
 
 
-
-//Bir aylik eventleri gosteren sayfa
+//Tum eventleri gosteren sayfa
 class AllPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -17,11 +16,13 @@ class AllPage extends StatefulWidget {
   }
 }
 
-class AllState extends State<AllPage> with Observer { //Observer page !!!!
+class AllState extends State<AllPage> with Observer {
+  //Observer page !!!!
 
   final DataSource _dataSource = DataSource(); //Veri iletisimi icin gerekli
-  Map<int, TaskGroup> _listGroup;
-
+  //
+  Map<String, TaskGroup> _listGroup; //Tarihleri taskGroup olarak gruplar
+  //Ornegin: 27 mayis 2020'deki tarihine sahip taskGrouplar
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class AllState extends State<AllPage> with Observer { //Observer page !!!!
     );
   }
 
-  ////////Observer nesne icin yonetim
+  ////////Observer nesne yonetimi
   @override
   void initState() {
     super.initState();
@@ -43,55 +44,63 @@ class AllState extends State<AllPage> with Observer { //Observer page !!!!
     super.dispose();
     _dataSource.unregister(this);
   }
+
 ////////////////////////////////////
 
   @override
-  void update() { // Verilerde guncelleme olunca calisan method
+  void update() {
+    // Verilerde guncelleme olunca calisan method
 
     getListGroups();
   }
 
-  void getListGroups() { //Verileri guncelleyen method
-    Map<int, TaskGroup> list = Map();
+  void getListGroups() {//Veritabanindan verileri cekip kendi icinde gruplar
+    // map halinde saklar
 
-    var taskFuture = _dataSource.getTasks();
+    Map<String, TaskGroup> list = Map(); //Map yapisi Date Tarihi => TaskGroup
 
+    var taskFuture = _dataSource.getTasks(); //tasklar future olarak aliniyor
 
+    taskFuture.then((data) { //Future'dan kendi tipine donustuluyor
+      //db'den future olarak veriler alindi
 
-      taskFuture.then((data){ //db'den future olarak veriler alindi
-
-        data.forEach((element) { // tum veriler gezildi
-          Task task = Task.fromObject(element); //alinan veri task obj donusturuldu
-
-          int day = task.beginDate.day; // gun alindi
-
-
-
-          if(!list.containsKey(day)) { // daha once gun yoksa collection'da olusturuldu
-
-            TaskGroup taskGroup = TaskGroup();
-            taskGroup.title = DateFormat.MMMd("tr_TR").format(task.beginDate);
-
-            list.putIfAbsent(day, () => taskGroup);
-          }
-            list[day].taskList.add(task); //kendi grubuna eklendi
+      data.forEach((element) {
+        // tum veriler geziliyor
+        Task task =
+            Task.fromObject(element); //elemen olarak alinan veri task'a donusturuluyor
 
 
-        });
+        String strDate = DateFormat.yMMMMd("tr_TR") //Tarihi gun, ay ve yil
+            .format(task.beginDate);                //olarak formatlar
+
+        if (!list.containsKey(strDate)) { //daha once map'ta oyle bir key yoksa
+
+          TaskGroup taskGroup = TaskGroup(); //taskGroup olusturuluyor
 
 
+          //Baslangic zamani 'gun ay yil' seklinde baslik olarak ekleniyor
+          taskGroup.title = DateFormat.yMMMMd("tr_TR")
+              .format(task.beginDate);
+
+          list.putIfAbsent( //yeni eleman olarak ekleniyor
+              strDate, () => taskGroup); //Task grubu, collection'a ekle
+        }
+        list[strDate].taskList.add(task); //Task gerekli taskGroup'a eklendi
       });
+    });
 
-    setState(() { //State tetiklendi
-      _listGroup = list;
+    setState(() {
+      //State tetiklendi
+      _listGroup = list; //_listGroup guncellendi
     });
   }
 
-  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) { //TaskGrup widget olsuturuldu
+  TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) {
+    //TaskGroup nesnesinden TaskGroupWidget olusturan method
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
-        update();
+        update(); //TaskGroup'taki data guncellendiginde calisacak olan method
       },
     );
   }
@@ -99,14 +108,17 @@ class AllState extends State<AllPage> with Observer { //Observer page !!!!
   ListView createListView() {
     if (_listGroup == null) getListGroups(); //eger collection bos ise doldur
 
-    return ListView.builder( //Colection'daki verilere gore listView olusturur
+    return ListView.builder(
+        //Colection'daki verilere gore listView olusturur
         itemCount: _listGroup.length,
         itemBuilder: (BuildContext context, int position) {
-
           //map'a index uzerinden erisebilmek icin anahtarlari listeye donusturuyoruz
           List keys = _listGroup.keys.toList();
 
-          return createTaskGroupWidget(_listGroup[keys[position]]);
+          var key = keys[position]; //anahtar aliniyor
+
+          return createTaskGroupWidget(
+              _listGroup[key]); //anahtardaki task group render ediliyor
         });
   }
 }
