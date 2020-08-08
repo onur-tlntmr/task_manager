@@ -23,7 +23,7 @@ class DateUtils{
     var hour = dateTime.hour; //Saat
     var minute = dateTime.minute; //dakika
 
-    var strHour, strMinute; //Saat ve dakikayi S
+    var strHour, strMinute; //Saat ve dakikayi tutar.
 
     var result = DateFormat.MMMd('tr_TR')
         .format(dateTime); // ay ve gun turkiyeye uygun hale getliriliyor
