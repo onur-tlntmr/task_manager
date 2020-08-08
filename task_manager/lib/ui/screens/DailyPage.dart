@@ -4,8 +4,8 @@ import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
-import 'package:task_manager/utils/Utils.dart';
-import 'dart:developer' as developer;
+import 'package:task_manager/utils/DateUtils.dart';
+
 //Gunluk tasklari gosteren sayfa
 
 class DailyPage extends StatefulWidget {
@@ -20,15 +20,15 @@ class DailyState extends State with Observer {
 
   final DataSource _dataSource = DataSource(); //Data islemleri icin gerekli
 
-  final Utils _utils = Utils(); //Bazi tarih formatlamalari icin gerekli
+  final DateUtils _utils = DateUtils(); //Bazi tarih formatlamalari icin gerekli
 
   List<Task> list;
 
-  var current = DateTime.now();
+  var current = DateTime.now(); //Usteki zamanin goruntuleyen degisken
 
   var w, h; // Ekran genisligi ve yuksekligini verir
 
-  Timer _timer;
+  Timer _clockTimer; //Saat bilgisini guncelleyen timer
 
   @override
   Widget build(BuildContext context) {
@@ -56,32 +56,33 @@ class DailyState extends State with Observer {
     _dataSource.register(this); // Observer olarak kendini ekler
   }
 
-  //Disopse edilince ise timer cikarilir
+
   @override
   void dispose() {
     super.dispose();
-    _timer.cancel();
+    _clockTimer.cancel(); //Disopse edilince ise timer iptal edilir
     _dataSource.unregister(this); // Artik ekranda render yapilamacagi icin observerList'ten cikarilir
   }
 
-  void _startTimer() { //Her saniyde saat'e bir saniye ekler
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+  void _startTimer() { //Her saniyde simdiki zamani'e gunceller
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         current = current.add(const Duration(seconds: 1));
       });
     });
   }
 
-  void calculateScreenSize(BuildContext context) { //Farkli cozunurlukerde reusable olmasi icin gerkekli
-    w = MediaQuery.of(context).size.width;
+  void calculateScreenSize(BuildContext context) { //Farkli cozunurlukerde reusable olmasi icin
+    w = MediaQuery.of(context).size.width;         //ekran cozunurlukleri hesaplanir
     h = MediaQuery.of(context).size.height;
   }
 
-  Widget createCard(Task task) { //Verilen task objesinden car olusturur
+  Widget createCard(Task task) { //Verilen task objesinden card olusturur
     return TaskCardWidget(
       task: task,
       onUpdate: () {
-        getData();
+        getData(); //Task uzerinde herhangi bir update oldugunda
+                  //Ui'in guncellemesi icin datalar guncellenir
       },
     );
   }
@@ -93,17 +94,17 @@ class DailyState extends State with Observer {
     if(list == null) //eger liste bos ise doldurulur
       getData();
 
-    return ListView.builder(
+    return ListView.builder( //ListView builder eder
         itemCount: list.length,
         itemBuilder: (BuildContext context, int position) {
-          return createCard(list[position]);
-        });
+          return createCard(list[position]); //Listedeki elemandan cardWidget'i
+        });                                  //render eder
   }
-
   void getData() { //task listesini olsuturur
-    var taskFuture = _dataSource.getTasks();
+    var taskFuture = _dataSource.getTasks(); //DB operasyonlari icin gerekli
 
-    List<Task> dataTask = List();
+
+    List<Task> dataTask = List(); // Bos liste olusturuyor
 
     DateTime current = DateTime.now(); //Simdiki zaman seciliyor
 
@@ -116,20 +117,19 @@ class DailyState extends State with Observer {
       });
     });
 
-    setState(() {
+    setState(() { //Ui'in guncellenmesi icin task tetikleniyor
       list = dataTask;
     });
   }
 
   Widget dateWidget() { //Ekranda tarih ve saat gosteren widget
-    DateTime dateTime = DateTime.now();
 
     return Column(
       children: <Widget>[
-        Text(_utils.dateFormatter(current),
+        Text(_utils.dateFormatter(current), //Tarih ve saatini gosterir
             style: TextStyle(fontSize: w * 0.04)),
         Text(
-          _utils.getLocalDay(dateTime),
+          _utils.getLocalDay(current), //Gunu string olarak gosterir
           style: TextStyle(fontSize: w * 0.07),
         )
       ],
@@ -137,7 +137,7 @@ class DailyState extends State with Observer {
   }
 
   @override
-  void update() { //Datalarda herhangi bir degisiklik oldugunda sayfayi guncller
+  void update() { //Datalarda herhangi bir degisiklik oldugunda sayfayi gunceller
     getData();
   }
 }
