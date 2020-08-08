@@ -4,18 +4,17 @@ import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/models/TaskGroup.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
 
+//Tasklari grup halinde gosterilmesini saglayan method
 class TaskGroupWidget extends StatefulWidget{
 
-  final TaskGroup taskGroup;
-  final Function onUpdate;
+  final TaskGroup taskGroup; //TaskGroup modeli
+  final Function onUpdate; //Tasklarin etkilesimi icin callback function
 
   TaskGroupWidget({@required this.taskGroup,this.onUpdate});
 
 
-
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return GroupListState();
   }
 }
@@ -23,18 +22,18 @@ class TaskGroupWidget extends StatefulWidget{
 
 class GroupListState extends State<TaskGroupWidget>{
 
-  var h ;
+  var screenHeight ; //Ekran yuksekligi
 
   List<Task> taskList;
 
   @override
   Widget build(BuildContext context) {
 
-    h = MediaQuery.of(context).size.height; //ekranin boyu alinir
+    screenHeight = MediaQuery.of(context).size.height; //ekranin yuksekligi atanir
 
     taskList  = widget.taskGroup.taskList; //tasklarin listesi
 
-    return Column(
+    return Column( //Title ve TaskListesi alt alta siralanir
       children: <Widget>[
         createHeader(),
         createListView(),
@@ -49,7 +48,7 @@ class GroupListState extends State<TaskGroupWidget>{
         alignment: Alignment.centerLeft,
         child: Text(
           widget.taskGroup.title,
-          style: TextStyle(fontSize: h * 0.06, color: Colors.red[700]),
+          style: TextStyle(fontSize: screenHeight * 0.06, color: Colors.red[700]),
         ),
       );
   }
@@ -57,12 +56,13 @@ class GroupListState extends State<TaskGroupWidget>{
   Widget createListView() { //Tasklari listView'a ceviren method
 
     return ListView.builder(
-        scrollDirection: Axis.vertical,
+        scrollDirection: Axis.vertical, //Dikey olarak scroll edilmesini saglar
         physics: ClampingScrollPhysics(),//Grouplar kendi aralarinda scroll edilmemesi icin gerekli
         shrinkWrap: true, //Nested listview kullanmak icin gerekli
         itemCount: taskList.length,
         itemBuilder: (BuildContext context, int position) {
-          return TaskCardWidget(task: taskList[position],onUpdate: widget.onUpdate,);
+          return TaskCardWidget(task: taskList[position],onUpdate: widget.onUpdate,); //Tasklist render ediliyor ve
+                                                                              // callback method task'a gönderiliyor
         });
   }
 
