@@ -19,7 +19,8 @@ class MonthlyState extends State<MonthlyPage> with Observer {
   //Observer page !!!!
 
   final DataSource _dataSource = DataSource(); //Veri iletisimi icin gerekli
-  Map<int, TaskGroup> _listGroup;
+  Map<int, TaskGroup> _listGroup; //Tarihleri taskGroup olarak gruplar
+  //Ornegin: 27 mayis 2020'deki tarihine sahip taskGrouplar
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class MonthlyState extends State<MonthlyPage> with Observer {
     );
   }
 
-  ////////7777Observer nesne icin yonetim
+  ////////Observer nesne icin yonetim
   @override
   void initState() {
     super.initState();
@@ -48,46 +49,50 @@ class MonthlyState extends State<MonthlyPage> with Observer {
   void update() {
     // Verilerde guncelleme olunca calisan method
 
-    getListGroups();
+    getListGroups(); //Veriler veritabanindan tekrar cekilir
   }
 
   void getListGroups() {
     //Verileri guncelleyen method
     Map<int, TaskGroup> list = Map();
 
-    var taskFuture = _dataSource.getTasks();
+    var taskFuture = _dataSource.getTasks();//db'den future olarak veriler alindi
 
-    taskFuture.then((data) {
-      //db'den future olarak veriler alindi
+
+    taskFuture.then((data) {//Future olarak alinan veri kendi tipine donusturuldu
 
       data.forEach((element) {
         // tum veriler gezildi
         Task task =
             Task.fromObject(element); //alinan veri task obj donusturuldu
 
-        DateTime beginDate = task.beginDate;
+        DateTime beginDate = task.beginDate; //Taskin baslangic zamani tutuluyor
 
-        DateTime current = DateTime.now();
+        DateTime current = DateTime.now(); //Simdiki zaman
 
         DateTime afterOneMonth =
-            current.add(new Duration(days: 30)); //Bir ay sonrasi
+            current.add(new Duration(days: 30)); //Simdiki Zamandan bir ay sonrasi
 
-        int beginDay; //baslangic gunu
 
-        //İslem sonraki bir aylik zaman dilimi icersinde ise
+        //İslem sonraki bir aylik zaman dilimi icersinde ise ve baslangic zamani gecmemis ise
         if (beginDate.isBefore(afterOneMonth) && current.isBefore(beginDate)) {
-          beginDay = beginDate.day;
+
+          int beginDay; //baslangic gunu
+
+          beginDay = beginDate.day; //Gun atamasi yapiliyor
 
           if (!list.containsKey(beginDay)) {
-            // daha once gun yoksa collection'da olusturuldu
+            // daha once gune ait taskGroup yoksa collection'da bir tane olusturuluyor
 
             TaskGroup taskGroup = TaskGroup();
+
+            //Baslik baslangic zamani ay gun olarak ayarlaniyor
             taskGroup.title = DateFormat.MMMd("tr_TR").format(task.beginDate);
 
-            list.putIfAbsent(beginDay, () => taskGroup);
+            list.putIfAbsent(beginDay, () => taskGroup); //Collection'a ekleniyor
           }
 
-          list[beginDay].taskList.add(task); //kendi grubuna eklendi
+          list[beginDay].taskList.add(task); //task kendi grubuna ekleniyor
         }
       });
     });
@@ -99,11 +104,11 @@ class MonthlyState extends State<MonthlyPage> with Observer {
   }
 
   TaskGroupWidget createTaskGroupWidget(TaskGroup taskGroup) {
-    //TaskGrup widget olsuturuldu
+    //TaskGroup widget olsturuldu
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
-        update();
+        update(); //Task uzerinde bir guncelleme yapilinca ui guncellenir
       },
     );
   }
@@ -118,7 +123,9 @@ class MonthlyState extends State<MonthlyPage> with Observer {
           //map'a index uzerinden erisebilmek icin anahtarlari listeye donusturuyoruz
           List keys = _listGroup.keys.toList();
 
-          return createTaskGroupWidget(_listGroup[keys[position]]);
+          var key = keys[position]; //Position'daki key aliniyor
+
+          return createTaskGroupWidget(_listGroup[key]); //Degerdeki taskGroup render ediliyor
         });
   }
 }
