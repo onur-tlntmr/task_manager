@@ -4,8 +4,10 @@ import 'package:task_manager/models/TaskGroup.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
-import 'package:task_manager/utils/Utils.dart';
+import 'package:task_manager/utils/DateUtils.dart';
 
+
+/* Haftalik Tasklari gostern sayfa*/
 class WeeklyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,19 +17,19 @@ class WeeklyPage extends StatefulWidget {
 }
 
 class WeeklyState extends State<WeeklyPage> with Observer {
-  final DataSource _dataSource = DataSource();
-  final Utils _utils = Utils();
+  final DataSource _dataSource = DataSource(); //Db operasyonlari icin gerekli
+  final DateUtils _utils = DateUtils(); //Custom Date formati icin kullanilacak
 
-  Map<String, TaskGroup> _listGroup;
+  Map<String, TaskGroup> _listGroup; //TaskGrouplarinin tutulacagi yapi
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
+  Widget build(BuildContext context) {// Sayfadaki Main Widget
     return Container(
       child: createListView(),
     );
   }
 
+  //////Observer yonetimi///////////////
   @override
   void initState() {
     super.initState();
@@ -39,23 +41,18 @@ class WeeklyState extends State<WeeklyPage> with Observer {
     super.dispose();
     _dataSource.unregister(this);
   }
+  ///////////////////////////////////////
 
-  @override
-  void update() {
-    // TODO: implement update
 
-    getListGroups();
-  }
-
+  //Bu method db'den tasklari cekip gruplar ve _listGroup degiskenini degistirerek ui'yi gunceller
   void getListGroups() {
-    Map<String, TaskGroup> list = Map();
+    Map<String, TaskGroup> list = Map(); //TaskGruplarini tutan yapi
 
-    var taskFuture = _dataSource.getTasks();
+    var taskFuture = _dataSource.getTasks(); //Tasklar future olarak aliniyor
 
-    taskFuture.then((data) {
-      //tasklari future olarak veritabanindan al
-      data.forEach((element) {
-        //icindeki her bir datayi kullan
+    taskFuture.then((data) { //alinan future collection olarak kullaniliyor
+      data.forEach((element) {//icindeki her bir datayi gezer
+
         Task t = Task.fromObject(element); // datayi task'a donustur
         DateTime beginDate = t.beginDate; //Baslangic zamani
         DateTime current = DateTime.now(); //simdiki zaman
@@ -64,13 +61,17 @@ class WeeklyState extends State<WeeklyPage> with Observer {
 
         String title; //Group basligi
 
+
+        //Eger bugun veya yarin ise ozel olarak basligi yazar
         if (current.day == beginDate.day)
           title = "Bugün";
         else if (beginDate.day - current.day == 1)
           title = "Yarın";
+
         else
           title = _utils.getLocalDay(beginDate);
-        //eger aranan gun ise ve en fazla bir hafta sonranin ise
+
+        //Saglanmasi gereken kosullar: bir haftalik sure zarfinda olmasi ve is'in gecmis olmamasi
         if (beginDate.isBefore(afterOneWeek) && current.isBefore(beginDate)) {
           TaskGroup taskGroup = TaskGroup(); // Yeni bir taskGroup olusturuluyor
           taskGroup.title = title; //Basligina gun'u veriyoruz
@@ -95,10 +96,16 @@ class WeeklyState extends State<WeeklyPage> with Observer {
     return TaskGroupWidget(
       taskGroup: taskGroup,
       onUpdate: () {
-        update();
+        update(); //Task uzerinde islem yapildigi zaman ui'yi gunceller
       },
     );
   }
+
+  @override
+  void update() {
+    getListGroups(); //Veritabanindan guncell bilgilerle ui gunceller
+  }
+
 
   ListView createListView() {
     //listGroup'lardan bir liste olusturur
@@ -113,7 +120,7 @@ class WeeklyState extends State<WeeklyPage> with Observer {
           String title = keys[position]; //positiondaki anahtar aliniyor
 
           return createTaskGroupWidget(
-              _listGroup[title]); //TaskGroupWidget'i olsturuluyor
+              _listGroup[title]); //TaskGroupWidget'i olusturur
         });
   }
 }
