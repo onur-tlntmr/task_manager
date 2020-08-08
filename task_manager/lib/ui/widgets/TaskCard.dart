@@ -36,25 +36,27 @@ class _TaskCardState extends State<TaskCardWidget> {
     //Ust siniftaki variable'lar aliniyor
     Task task = widget.task;
 
-    var _beginDate = _utils.dateFormatter(task.beginDate);
-    var _finishedDate = _utils.dateFormatter(task.finishedDate);
+    //Zamanlarin formatlanmis sekli ornek olarak: '8 Agu 17:37'
+    var _beginDate = _utils.dateFormatter(task.beginDate); //Baslangic zamani
+    var _finishedDate = _utils.dateFormatter(task.finishedDate); //Bitis zamani
 
 
     return Card(
 
       child: ListTile(
-        leading: IconButton(icon: Icon(iconMap[task.status])),
-        title: Text(widget.task.title),
-        subtitle: Text("$_beginDate\n$_finishedDate"),
+        //Task'in basina durmunu belirten icon getirilir
+        leading: IconButton(icon: Icon(iconMap[task.status]),onPressed: ()=>{},), //Onpressed bos birakiliyor
+        title: Text(widget.task.title), //Card basligi olarak ta task'in basligi getirilir
+        subtitle: Text("$_beginDate\n$_finishedDate"),//Altina da baslangic ve bitis tarihleri alt alta yazar
 
         onTap: () {
-          checkedTask(task);
+          checkedTask(task); //Task'a tiklaninca checkTask methodu cagirilir
         },
 
-        trailing: IconButton(
+        trailing: IconButton( //Silme butonu
           icon: Icon(Icons.delete),
           onPressed: () {
-            deleteTask(task);
+            deleteTask(task); //tiklaninca deleteTask tetiklenir
           },
         ),
 
@@ -63,21 +65,22 @@ class _TaskCardState extends State<TaskCardWidget> {
     );
   }
 
-  void deleteTask(Task task) async {
+  void deleteTask(Task task) async { //Veri Tabanindan task silinir
     await _dataSource.delete(task);
-    widget.onUpdate();
+    widget.onUpdate(); //UI'in guncellenmesi icin callback fonksiyon tetiklenir
   }
 
-  void checkedTask(Task task) {
-    DateTime current = DateTime.now();
+  void checkedTask(Task task) { //Taskin onaylanmasini saglayan method
+    DateTime current = DateTime.now(); //Simdiki zaman
 
-    if (task.status == "waiting" || task.status ==
+    if (task.status == "waiting" || task.status == //Task'in durumunu guncelleyen kosul:
         "running") { // Islem bekleyen veya devam eden durumda ise
-      task.status = "complete";
-      _dataSource.update(task);
-      widget.onUpdate();
+      task.status = "complete"; //Tamamlandi olarak isaretlenir
+      _dataSource.update(task); //Db guncellenir
+      widget.onUpdate(); //UI icin callback func tetiklenir
     }
 
+    //Task'in durumunu geri alan mehod
     else if (task.finishedDate.isAfter(current)) { //Eger task bitmemis ise
 
       if (task.beginDate.isAfter(current))
@@ -85,8 +88,8 @@ class _TaskCardState extends State<TaskCardWidget> {
       else
         task.status = "running";
 
-      _dataSource.update(task);
-      widget.onUpdate();
+      _dataSource.update(task); //Db guncelleniyor
+      widget.onUpdate(); //UI icin callback func tetiklenir
     }
   }
 }
