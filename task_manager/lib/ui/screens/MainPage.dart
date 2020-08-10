@@ -6,7 +6,7 @@ import 'package:task_manager/ui/screens/DailyPage.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/ui/screens/MonthlyPage.dart';
 import 'package:task_manager/ui/screens/WeeklyPage.dart';
-import 'package:task_manager/utils/DataUpdater.dart';
+import 'package:task_manager/utils/DataUpdateService.dart';
 
 /*
  Bu sinif tum sayfalarin tasiyicisi konumundadir
