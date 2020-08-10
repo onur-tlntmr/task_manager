@@ -17,6 +17,8 @@ class AddPage extends StatefulWidget {
   }
 }
 
+//TODO Tasklar icin alarim ozelligi eklenecek
+
 class AddPageState extends State {
   final _scaffoldKey = GlobalKey<ScaffoldState>(); //snackbar icin gerekli
 
