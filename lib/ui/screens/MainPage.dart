@@ -152,7 +152,8 @@ class MainState extends State {
       child: FloatingActionButton(
         backgroundColor: Colors.white,
         child: IconButton(
-          icon: Icon(Icons.add),
+          icon: Icon(Icons.add,color: Colors.black87,), 
+          onPressed: () => {}, //Bos callback method
         ),
         onPressed: () { //Tiklaninca
           goToAdd(context); //Task ekleme ekranina gider
