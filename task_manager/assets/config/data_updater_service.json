@@ -1,0 +1,4 @@
+{
+    "_comment":"Bu config dosyasi DataUpdaterServis'in calisma parametrelerini icerir.",
+    "timer_period": 15
+}
