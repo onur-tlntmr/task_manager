@@ -2,69 +2,41 @@
 * Task model'i
 *
 * */
-
-
-
 class Task {
-  int _id;
-  String _title;
-  DateTime _beginDate;
-  DateTime _finishedDate;
-  String _status;
-
+  int id;
+  String title;
+  DateTime beginDate;
+  DateTime finishedDate;
+  String status;
 
   Task(); //Default constructor
 
-  Task.wihtParams( //Parametreli constructor
-      this._title, this._beginDate, this._finishedDate, this._status);
+  Task.wihtParams(
+      //Parametreli constructor
+      this.title,
+      this.beginDate,
+      this.finishedDate,
+      this.status);
 
-  int get id => _id;
-
-  set id(int value) {
-    _id = value;
-  }
-
-  String get title => _title;
-
-  set title(String value) {
-    _title = value;
-  }
-
-  DateTime get beginDate => _beginDate;
-
-  set beginDate(DateTime value) {
-    _beginDate = value;
-  }
-
-  DateTime get finishedDate => _finishedDate;
-
-  set finishedDate(DateTime value) {
-    _finishedDate = value;
-  }
-
-  String get status => _status;
-
-  set status(String value) {
-    _status = value;
-  }
-
-  Map<String, dynamic> toMap() { //Task'i map halinde donderir
+  Map<String, dynamic> toMap() {
+    //Task'i map halinde donderir
     var map = Map<String, dynamic>();
 
-    map["id"] = _id;
-    map["title"] = _title;
-    map["status"] = _status;
-    map["beginDate"] = _beginDate.toString();
-    map["finishedDate"] = _finishedDate.toString();
+    map["id"] = id;
+    map["title"] = title;
+    map["status"] = status;
+    map["beginDate"] = beginDate.toString();
+    map["finishedDate"] = finishedDate.toString();
 
     return map;
   }
 
-  Task.fromObject(dynamic o) { //Farkli tipte gelen verilerden task olsuturan constructor
-    this._id = o["Id"];        //Ornek olarak yukardaki map gibi
-    this._title = o["Title"];
-    this._status = o["Status"];
-    this._beginDate = DateTime.parse(o["BeginDate"]);
-    this._finishedDate = DateTime.parse(o["FinishedDate"]);
+  Task.fromObject(dynamic o) {
+    //Farkli tipte gelen verilerden task olsuturan constructor
+    this.id = o["Id"]; //Ornek olarak yukardaki map gibi
+    this.title = o["Title"];
+    this.status = o["Status"];
+    this.beginDate = DateTime.parse(o["BeginDate"]);
+    this.finishedDate = DateTime.parse(o["FinishedDate"]);
   }
 }

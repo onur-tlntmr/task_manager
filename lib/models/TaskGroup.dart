@@ -6,35 +6,16 @@ import 'Task.dart';
 *
 * */
 
-class TaskGroup{
-  List<Task> _taskList;
+class TaskGroup {
+  List<Task> taskList;
 
-  String _title;
+  String title;
 
-
-  TaskGroup(){
-    _taskList = List();
+  TaskGroup() {
+    taskList = List();
   }
 
-
-  TaskGroup.withTitle(this._title){
+  TaskGroup.withTitle(this.title) {
     TaskGroup();
   }
-
-
-  List<Task> get taskList => _taskList;
-
-  set taskList(List<Task> value) {
-    _taskList = value;
-  }
-
-  String get title => _title;
-
-  set title(String value) {
-    _title = value;
-  }
-
-
-
-
 }
