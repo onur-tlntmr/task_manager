@@ -10,7 +10,7 @@ import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
 class MonthlyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    
     return MonthlyState();
   }
 }
@@ -24,10 +24,11 @@ class MonthlyState extends State<MonthlyPage> with Observer {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+
     return Container(
       child: createListView(),
     );
+
   }
 
   ////////Observer nesne icin yonetim

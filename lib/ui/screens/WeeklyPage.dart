@@ -11,8 +11,9 @@ import 'package:task_manager/utils/DateUtils.dart';
 class WeeklyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+
     return WeeklyState();
+    
   }
 }
 

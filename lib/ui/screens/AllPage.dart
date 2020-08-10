@@ -11,7 +11,7 @@ import 'package:task_manager/ui/widgets/TaskGroupWidget.dart';
 class AllPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    
     return AllState();
   }
 }
@@ -26,7 +26,7 @@ class AllState extends State<AllPage> with Observer {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    
     return Container(
       child: createListView(),
     );

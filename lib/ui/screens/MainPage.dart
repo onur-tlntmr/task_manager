@@ -14,7 +14,7 @@ import 'package:task_manager/utils/DataUpdateService.dart';
 class MainPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    
     return MainState();
   }
 }
@@ -39,7 +39,7 @@ class MainState extends State {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    
     initializeDateFormatting('tr'); // Tarih icin yerellestirme yapiliyor
 
     h = MediaQuery.of(context).size.height; //Ekranin yukseklik bilgisini alir
