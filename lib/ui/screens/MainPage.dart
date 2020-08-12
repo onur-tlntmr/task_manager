@@ -153,11 +153,11 @@ class MainState extends State {
         backgroundColor: Colors.white,
         child: IconButton(
           icon: Icon(Icons.add,color: Colors.black87,), 
-          onPressed: () => {}, //Bos callback method
-        ),
-        onPressed: () { //Tiklaninca
+          onPressed: () { //Tiklaninca
           goToAdd(context); //Task ekleme ekranina gider
         },
+        ),
+        onPressed: () => {}, //Bos callback method
       ),
     );
   }
