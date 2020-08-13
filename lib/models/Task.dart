@@ -3,11 +3,13 @@
 *
 * */
 class Task {
-  int id;
-  String title;
-  DateTime beginDate;
-  DateTime finishedDate;
-  String status;
+  int id; //Task id'si
+  String title; //Task basligi
+  DateTime beginDate; //Task'in baslangic zamani
+  DateTime finishedDate; //Task'in bitis zamani
+  String status; //task'in durumu
+  Duration beginAlarmDuration; //Alarm'in task'in baslangicindan
+  //Ne kadar once baslayacagi
 
   Task(); //Default constructor
 
@@ -16,7 +18,8 @@ class Task {
       this.title,
       this.beginDate,
       this.finishedDate,
-      this.status);
+      this.status,
+      this.beginAlarmDuration);
 
   Map<String, dynamic> toMap() {
     //Task'i map halinde donderir
@@ -28,15 +31,32 @@ class Task {
     map["beginDate"] = beginDate.toString();
     map["finishedDate"] = finishedDate.toString();
 
+    if (beginAlarmDuration != null) //Girilen sure null degilse
+
+      map["beginAlarmDuration"] =
+          beginAlarmDuration.inMilliseconds; //milisaniye cinsinden map'a gonder
+
+    //zaten null ise degiskene atama yapilmadigi icin null olacaktir
+
     return map;
   }
 
   Task.fromObject(dynamic o) {
-    //Farkli tipte gelen verilerden task olsuturan constructor
+    //Map'tan task olusturmak icin kullanilir
     this.id = o["Id"]; //Ornek olarak yukardaki map gibi
     this.title = o["Title"];
     this.status = o["Status"];
     this.beginDate = DateTime.parse(o["BeginDate"]);
     this.finishedDate = DateTime.parse(o["FinishedDate"]);
+
+    final int durationMilliSeconds = o["BeginAlarmDuration"];
+
+    if (durationMilliSeconds != null) { //Eger sure var ise ekle
+      
+      this.beginAlarmDuration = Duration(
+          milliseconds: o["BeginAlarmDuration"]); //Milisaniye cinsinden kullan
+    }
+
+    //Sure yoksa zaten null olacaktir
   }
 }
