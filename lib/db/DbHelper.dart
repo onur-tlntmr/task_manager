@@ -18,37 +18,38 @@ class DbHelper {
   final String colBeginDate = "BeginDate";
   final String colFinishedDate = "FinishedDate";
   final String colStatus = "Status";
+  final String colAlarmDuration = "BeginAlarmDuration";
 
   static final DbHelper _dbHelper = DbHelper._internal(); // singleton object
 
-  static Database _db ; // db objesi
+  static Database _db; // db objesi
 
-  DbHelper._internal();// default constructor
+  DbHelper._internal(); // default constructor
 
-  factory DbHelper(){
+  factory DbHelper() {
     return _dbHelper; // surekli ayni instace'i donderir
   }
 
-
-  Future<Database> get db async { //singleton db objesi donderir
-    if (_db == null)
-      _db = await initializeDb();
+  Future<Database> get db async {
+    //singleton db objesi donderir
+    if (_db == null) _db = await initializeDb();
     return _db;
   }
 
+  Future<Database> initializeDb() async {
+    //DB baglantisini yapan ve donduren method
+    Directory directory = await getApplicationDocumentsDirectory(); //Db'nin kaydedilecegi en uygun yer bulunuyor
 
-  Future<Database> initializeDb() async { //DB baglantisini yapan ve donduren method
-    Directory directory = await getApplicationDocumentsDirectory();
+    String path = directory.path + "tasks.db"; //path'i olusturuluyor
 
-    String path = directory.path + "tasks.db";
-
-    return await openDatabase(path, version: 1, onCreate: _createDb);
+    //Db varsa geri donderiliyor yoksa yeniden olusturuluyor
+    return await openDatabase(path, version: 1, onCreate: _createDb); 
   }
 
-  void _createDb(Database db, int version) async {
+  void _createDb(Database db, int version) async { //Db olusturan method 
     await db.execute(
         "CREATE TABLE $tblTask($colId INTEGER PRIMARY KEY AUTOINCREMENT , $colTitle TEXT, $colBeginDate TEXT, "
-            "$colFinishedDate TEXT, $colStatus TEXT )");
+        "$colFinishedDate TEXT, $colStatus TEXT, $colAlarmDuration INTEGER )");
   }
 
 /*
@@ -58,43 +59,42 @@ class DbHelper {
 *
 * */
 
-  Future<int> insert(Task task) async { //Database'e task objesini ekler ve operasyon kodunu donderir
+  Future<int> insert(Task task) async {
+    //Database'e task objesini ekler ve operasyon kodunu donderir
     final Database database = await db;
-    return await database.insert(tblTask, task.toMap()); //param1: tablo adi, param2: task verileri
+    return await database.insert(
+        tblTask, task.toMap()); //param1: tablo adi, param2: task verileri
   }
 
-
-  Future<int> update(Task task) async { //Parametre olarak aldigi task'i guncelleyen method
+  Future<int> update(Task task) async {
+    //Parametre olarak aldigi task'i guncelleyen method
 
     final Database database = await db;
 
-    var result = database.update(
-        tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
+    var result = database
+        .update(tblTask, task.toMap(), where: "$colId=?", whereArgs: [task.id]);
 
     return result; //Operation sonucunu donderir
   }
 
-
-  Future<int> delete(int id) async { //Id'si verilen taski siler
+  Future<int> delete(int id) async {
+    //Id'si verilen taski siler
 
     final Database database = await db;
 
     var result = database.delete(tblTask, where: "$colId=?", whereArgs: [id]);
 
-    return result;//Operation sonucunu donerir
+    return result; //Operation sonucunu donerir
   }
 
-
-
-  Future<List> getTasks() async { //Tum tasklari  geri donduren method
+  Future<List> getTasks() async {
+    //Tum tasklari  geri donduren method
 
     final Database database = await db;
 
-    List result = await database.rawQuery("SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
-    return result;  //Operation sonucunu donderir
+    List result = await database.rawQuery(
+        "SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
+
+    return result; //Operation sonucunu donderir
   }
-
-
-
-
 }
