@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:task_manager/services/time_services/TimeService.dart';
 import 'package:task_manager/ui/screens/AddPage.dart';
 import 'package:task_manager/ui/screens/AllPage.dart';
 import 'package:task_manager/ui/screens/DailyPage.dart';
@@ -14,7 +15,6 @@ import 'package:task_manager/utils/DataUpdateService.dart';
 class MainPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    
     return MainState();
   }
 }
@@ -26,20 +26,20 @@ class MainState extends State {
 
   var h, w; //ekran cozunurlukleri
 
-  final DataSource dataSource = new DataSource(); //Db operasyonlari icin gerekli
+  final DataSource dataSource =
+      new DataSource(); //Db operasyonlari icin gerekli
 
   List<Color> _dotColors = List(); //nokta renklerini tutan collection
 
   PageController _pageController; //page'lerin arasinda gezinmek icin gerekli
 
 //Bu servis tasklarin takibini yapar ornegin: olsturulan task tamamlanmamis ise onu tamamlanmamis olarak isaretler
-  DataUpdaterService service = DataUpdaterService();
-
-
+  DataUpdaterService dataUpdaterService = DataUpdaterService();
+//TimeService yazilima gercek zamani sunar ve degisimlerini tetikler
+  TimeService _timeService = TimeService();
 
   @override
   Widget build(BuildContext context) {
-    
     initializeDateFormatting('tr'); // Tarih icin yerellestirme yapiliyor
 
     h = MediaQuery.of(context).size.height; //Ekranin yukseklik bilgisini alir
@@ -65,22 +65,39 @@ class MainState extends State {
     );
   }
 
+  void startServices() {
+    //Servisleri baslatir
+    dataUpdaterService
+        .startService(); //Task'larin durum bilgisini takib eden servisi baslatir
+
+    _timeService.startService(); //Yazilimin gercek zamani almasi icin gerekli
+  }
+
+  void closeServices() {
+    //Servisleri kapatan method
+    dataUpdaterService.closeService();
+    _timeService.closeService();
+  }
+
   @override
   void initState() {
     //State baslandiginda
     super.initState();
-    service.startService(); //Task'larin durum bilgisini takib eden servisi baslatir
-    _pageController = PageController(initialPage: 0); //Page controller ataniyor secili elemani 0 olarak ayarlaniyor
+    startServices();
+    _pageController = PageController(
+        initialPage:
+            0); //Page controller ataniyor secili elemani 0 olarak ayarlaniyor
   }
 
   @override
   void dispose() {
     super.dispose();
-    service.closeService(); //dispose edildiginde servis kapatilir
+    closeServices();
     _pageController.dispose(); //pageController'da hafizdan ucurulur
   }
 
-  Widget createPageView(){ //PageView Widget'ini donduren method
+  Widget createPageView() {
+    //PageView Widget'ini donduren method
     return PageView(
       controller: _pageController,
       scrollDirection: Axis.horizontal, //Yatay scroll attribute
@@ -89,7 +106,8 @@ class MainState extends State {
           changeColor(index); //Page Degisme eventi yakalaniyor
         });
       },
-      children: <Widget>[ //Pages
+      children: <Widget>[
+        //Pages
         DailyPage(),
         WeeklyPage(),
         MonthlyPage(),
@@ -98,10 +116,11 @@ class MainState extends State {
     );
   }
 
-
-  void initDotColors() { //Indicator renklerini collection'a ekler
+  void initDotColors() {
+    //Indicator renklerini collection'a ekler
     if (pageCount > 0) {
-      _dotColors.add(Colors.blueAccent); //ilk olan secili olacagi icin mavi yapilir
+      _dotColors
+          .add(Colors.blueAccent); //ilk olan secili olacagi icin mavi yapilir
 
       for (int i = 1; i < pageCount; i++) {
         _dotColors.add(Colors.black45);
@@ -109,19 +128,26 @@ class MainState extends State {
     }
   }
 
-  Widget createIndicator() { //IndicatorWidget'ini olsturur
+  Widget createIndicator() {
+    //IndicatorWidget'ini olsturur
     List<Widget> children = List(); //Buttonlarin tutuldugu yapi
 
-    for (int i = 0; i < pageCount; i++) { //Page sayisi kadar buton olusturulur
+    for (int i = 0; i < pageCount; i++) {
+      //Page sayisi kadar buton olusturulur
       children.add(IconButton(
-        icon: Icon(Icons.lens, color: _dotColors[i]),  //Iconlar olusturuluyor ve renkleri sirasiyla ataniyor
+        icon: Icon(Icons.lens,
+            color: _dotColors[
+                i]), //Iconlar olusturuluyor ve renkleri sirasiyla ataniyor
         iconSize: _indicatorIconSize, //Boyutlari ataniyor
-        onPressed: (){ //Basildigi sayfaya gider
-          _pageController.animateToPage(i, duration: Duration(milliseconds: 350), curve: Curves.bounceInOut);
-      },
+        onPressed: () {
+          //Basildigi sayfaya gider
+          _pageController.animateToPage(i,
+              duration: Duration(milliseconds: 350), curve: Curves.bounceInOut);
+        },
       ));
     }
-    return Row(//Noktalari ayni satirda tutar
+    return Row(
+      //Noktalari ayni satirda tutar
       mainAxisAlignment: MainAxisAlignment.center, //Merkeze alir
       children: children,
     );
@@ -152,10 +178,14 @@ class MainState extends State {
       child: FloatingActionButton(
         backgroundColor: Colors.white,
         child: IconButton(
-          icon: Icon(Icons.add,color: Colors.black87,), 
-          onPressed: () { //Tiklaninca
-          goToAdd(context); //Task ekleme ekranina gider
-        },
+          icon: Icon(
+            Icons.add,
+            color: Colors.black87,
+          ),
+          onPressed: () {
+            //Tiklaninca
+            goToAdd(context); //Task ekleme ekranina gider
+          },
         ),
         onPressed: () => {}, //Bos callback method
       ),
