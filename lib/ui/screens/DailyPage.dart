@@ -1,6 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:task_manager/models/Task.dart';
+import 'package:task_manager/services/time_services/TimeObserver.dart';
+import 'package:task_manager/services/time_services/TimeService.dart';
 import 'package:task_manager/source/DataSource.dart';
 import 'package:task_manager/source/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
@@ -11,125 +12,126 @@ import 'package:task_manager/utils/DateUtils.dart';
 class DailyPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    
-
     return DailyState();
   }
 }
-class DailyState extends State with Observer {
-
+/**
+ * Bu sinif gunluk tasklari gosterir
+ * Veri degisimleri icin observer sinifi olarak implemente edilmistir
+ * Clock icin ise TimeObserver implemete edilmistir
+ */
+class DailyState extends State implements Observer, TimeObserver {
   final DataSource _dataSource = DataSource(); //Data islemleri icin gerekli
 
   final DateUtils _utils = DateUtils(); //Bazi tarih formatlamalari icin gerekli
 
-  List<Task> list;
+  TimeService _timeService = TimeService(); //Saniye  degisimlerini takip etmek icin gerekli 
 
-  var current = DateTime.now(); //Usteki zamanin goruntuleyen degisken
+  List<Task> list; //Tasklarin listesi
+
+  var clockTime; //Usteki zamanin goruntuleyen degisken
 
   var w, h; // Ekran genisligi ve yuksekligini verir
 
-  Timer _clockTimer; //Saat bilgisini guncelleyen timer
-
   @override
   Widget build(BuildContext context) {
-
     calculateScreenSize(context); // Ekran boyutlarini hesaplar
 
     return Container(
-      child:Column(
+      child: Column(
         children: <Widget>[
           dateWidget(),
           Expanded(
             child: createListView(),
           )
         ],
-      ) ,
+      ),
     );
-
-
   }
 
   @override
-  void initState() { //State yonetimi basladiginda
+  void initState() {
+    //State yonetimi basladiginda
     super.initState();
-    _startTimer(); //Clock Timer'i baslatir
+    
+    clockTime = _timeService.realTime; //timeServis'ten zaman aliniyor
+
+    _timeService.register(this); //Time observer olarak servise ekleniyor
     _dataSource.register(this); // Observer olarak kendini ekler
   }
-
 
   @override
   void dispose() {
     super.dispose();
-    _clockTimer.cancel(); //Disopse edilince ise timer iptal edilir
-    _dataSource.unregister(this); // Artik ekranda render yapilamacagi icin observerList'ten cikarilir
+    _timeService.unregister(this);
+    _dataSource.unregister(
+        this); // Artik ekranda render yapilamacagi icin observerList'ten cikarilir
   }
 
-  void _startTimer() { //Her saniyde simdiki zamani'e gunceller
-    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        current = current.add(const Duration(seconds: 1));
-      });
-    });
-  }
-
-  void calculateScreenSize(BuildContext context) { //Farkli cozunurlukerde reusable olmasi icin
-    w = MediaQuery.of(context).size.width;         //ekran cozunurlukleri hesaplanir
+  void calculateScreenSize(BuildContext context) {
+    //Farkli cozunurlukerde reusable olmasi icin
+    w = MediaQuery.of(context).size.width; //ekran cozunurlukleri hesaplanir
     h = MediaQuery.of(context).size.height;
   }
 
-  Widget createCard(Task task) { //Verilen task objesinden card olusturur
+  Widget createCard(Task task) {
+    //Verilen task objesinden card olusturur
     return TaskCardWidget(
       task: task,
       onUpdate: () {
         getData(); //Task uzerinde herhangi bir update oldugunda
-                  //Ui'in guncellemesi icin datalar guncellenir
+        //Ui'in guncellemesi icin datalar guncellenir
       },
     );
   }
 
+  ListView createListView() {
+    //Kartlardan listView olsuturur
 
-
-  ListView createListView() { //Kartlardan listView olsuturur
-
-    if(list == null) //eger liste bos ise doldurulur
+    if (list == null) //eger liste bos ise doldurulur
       getData();
 
-    return ListView.builder( //ListView builder eder
+    return ListView.builder(
+        //ListView builder eder
         itemCount: list.length,
         itemBuilder: (BuildContext context, int position) {
           return createCard(list[position]); //Listedeki elemandan cardWidget'i
-        });                                  //render eder
+        }); //render eder
   }
-  void getData() { //task listesini olsuturur
-    var taskFuture = _dataSource.getTasks(); //DB operasyonlari icin gerekli
 
+  void getData() {
+    //task listesini olsuturur
+    var taskFuture = _dataSource.getTasks(); //DB operasyonlari icin gerekli
 
     List<Task> dataTask = List(); // Bos liste olusturuyor
 
     DateTime current = DateTime.now(); //Simdiki zaman seciliyor
 
     taskFuture.then((data) {
-      data.forEach((element) { //elemanlar arasindan geziliyor
+      data.forEach((element) {
+        //elemanlar arasindan geziliyor
 
         Task task = Task.fromObject(element);
-        if(task.beginDate.day == current.day) //task'in gunu simdiki gun ise
+        if (task.beginDate.day == current.day) //task'in gunu simdiki gun ise
           dataTask.add(task); //task ekeleniyor
       });
     });
 
-    setState(() { //Ui'in guncellenmesi icin task tetikleniyor
+    setState(() {
+      //Ui'in guncellenmesi icin task tetikleniyor
       list = dataTask;
     });
   }
 
-  Widget dateWidget() { //Ekranda tarih ve saat gosteren widget
+  Widget dateWidget() {
+    //Ekranda tarih ve saat gosteren widget
 
     return Column(
       children: <Widget>[
-        Text(_utils.dateFormatter(current), //Tarih ve saatini gosterir
+        Text(_utils.dateFormatter(clockTime), //Tarih ve saatini gosterir
             style: TextStyle(fontSize: w * 0.04)),
         Text(
-          _utils.getLocalDay(current), //Gunu string olarak gosterir
+          _utils.getLocalDay(clockTime), //Gunu string olarak gosterir
           style: TextStyle(fontSize: w * 0.07),
         )
       ],
@@ -137,7 +139,19 @@ class DailyState extends State with Observer {
   }
 
   @override
-  void update() { //Datalarda herhangi bir degisiklik oldugunda sayfayi gunceller
+  void update() {
+    //Datalarda herhangi bir degisiklik oldugunda sayfayi gunceller
     getData();
+  }
+
+  void updateClock() { //clockTime'i guncelleyerek ui tetiklenmesini saglar
+    setState(() {
+      clockTime = _timeService.realTime;
+    });
+  }
+
+  @override
+  timeChanged() { //TimeServis'teki zaman degisince
+    updateClock(); //ui'daki saat guncellenmesi saglanir
   }
 }
