@@ -103,15 +103,17 @@ class DbHelper {
     return result; //Operation sonucunu donderir
   }
 
-  Future<List> getTasksWithDate(DateTime dateTime) async {
-    final Database database = await db;
+  Future<List> getTasksWithDate(DateTime dateTime) async { //Ozel tarihe gore tasklari getirir
+    final Database database = await db; 
 
-    final DateUtils utils = DateUtils();
+    final DateUtils utils = DateUtils(); //DateTime formatlamak icin gerekli
 
-    String strDate = utils.getSqlDateFormat(dateTime);
+    String strDate = utils.getSqlDateFormat(dateTime); //Sql sorgusu icin formatlaniyor
+                                                       //Daha fazlasi icin bulundugu sinifa bakilabilir 
 
+    //Baslangic zamani istenilen tarihi donderir                                                       
     List result = await database.rawQuery(
-        "SELECT * FROM $tblTask ORDER BY $colBeginDate WHERE  LIKE'%$strDate%'");
+        "SELECT * FROM $tblTask ORDER BY $colBeginDate WHERE $colBeginDate LIKE'%$strDate%'"); 
 
     return result;
   }
