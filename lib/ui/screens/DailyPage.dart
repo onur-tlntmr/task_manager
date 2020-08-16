@@ -15,7 +15,7 @@ class DailyPage extends StatefulWidget {
     return DailyState();
   }
 }
-/**
+/*
  * Bu sinif gunluk tasklari gosterir
  * Veri degisimleri icin observer sinifi olarak implemente edilmistir
  * Clock icin ise TimeObserver implemete edilmistir

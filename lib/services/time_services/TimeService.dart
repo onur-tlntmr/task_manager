@@ -3,7 +3,7 @@ import 'package:task_manager/services/time_services/TimeObservable.dart';
 import 'package:task_manager/services/time_services/TimeObserver.dart';
 import 'package:task_manager/services/IService.dart';
 
-/**
+/*
  * Bu sinif zamani saniye olarak sayar 
  * Her degisimde kendi observer'larini tetikler.
  * 
