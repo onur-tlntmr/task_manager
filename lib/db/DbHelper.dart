@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:task_manager/models/Task.dart';
+import 'package:task_manager/utils/DateUtils.dart';
 
 /*
 * Database crud operasyonlarindan sorumlu sinif
@@ -38,15 +39,19 @@ class DbHelper {
 
   Future<Database> initializeDb() async {
     //DB baglantisini yapan ve donduren method
-    Directory directory = await getApplicationDocumentsDirectory(); //Db'nin kaydedilecegi en uygun yer bulunuyor
+    Directory directory =
+        await getApplicationDocumentsDirectory(); //Db'nin kaydedilecegi en uygun yer bulunuyor
 
     String path = directory.path + "tasks.db"; //path'i olusturuluyor
 
+    print("$path");
+
     //Db varsa geri donderiliyor yoksa yeniden olusturuluyor
-    return await openDatabase(path, version: 1, onCreate: _createDb); 
+    return await openDatabase(path, version: 1, onCreate: _createDb);
   }
 
-  void _createDb(Database db, int version) async { //Db olusturan method 
+  void _createDb(Database db, int version) async {
+    //Db olusturan method
     await db.execute(
         "CREATE TABLE $tblTask($colId INTEGER PRIMARY KEY AUTOINCREMENT , $colTitle TEXT, $colBeginDate TEXT, "
         "$colFinishedDate TEXT, $colStatus TEXT, $colAlarmDuration INTEGER )");
@@ -96,5 +101,18 @@ class DbHelper {
         "SELECT * FROM $tblTask ORDER BY $colBeginDate"); //Tasklari baslangic zamanlarina gore siralar
 
     return result; //Operation sonucunu donderir
+  }
+
+  Future<List> getTasksWithDate(DateTime dateTime) async {
+    final Database database = await db;
+
+    final DateUtils utils = DateUtils();
+
+    String strDate = utils.getSqlDateFormat(dateTime);
+
+    List result = await database.rawQuery(
+        "SELECT * FROM $tblTask ORDER BY $colBeginDate WHERE  LIKE'%$strDate%'");
+
+    return result;
   }
 }
