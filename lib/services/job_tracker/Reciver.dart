@@ -9,12 +9,17 @@ import 'package:task_manager/services/data_service/DataSource.dart';
 class Reciver {
   final DataSource _dataSource = DataSource();
 
-  void statusUpdate(Task task) {
-    if (task.status == "waiting" || task.status == "running") {
-      //bekliyor veya devam ediyor durumunda ise
-      task.status = "incomplete"; //tamamlanmamis olarak guncelle
+  void statusIncompleteUpdate(Task task) {
+    task.status = "incomplete";
 
-      _dataSource.update(task); //update'i veri tabanina yansit
-    }
+    _dataSource.update(task); //update'i veri tabanina yansit
   }
+
+  void statusRuningUpdate(Task task) {
+    task.status = "running";
+
+    _dataSource.update(task); //update'i veri tabanina yansit
+  }
+
+  void createAlarm(Task task) {}
 }
