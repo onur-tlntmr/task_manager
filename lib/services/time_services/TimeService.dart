@@ -9,7 +9,7 @@ import 'package:task_manager/services/IService.dart';
  * 
  */
 
-class TimeService implements TimeObservable, Service {
+class TimeService implements TimeObservable, IService {
   static TimeService _timeService = TimeService.internal();
 
   List<TimeObserver> _observers; //Observerlarin tutuldugu collection
