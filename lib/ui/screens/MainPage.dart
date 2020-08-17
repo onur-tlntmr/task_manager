@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:task_manager/services/IService.dart';
+import 'package:task_manager/services/job_tracker/JobTracker.dart';
 import 'package:task_manager/services/time_services/TimeService.dart';
 import 'package:task_manager/ui/screens/AddPage.dart';
 import 'package:task_manager/ui/screens/AllPage.dart';
@@ -7,7 +9,6 @@ import 'package:task_manager/ui/screens/DailyPage.dart';
 import 'package:task_manager/services/data_service/DataSource.dart';
 import 'package:task_manager/ui/screens/MonthlyPage.dart';
 import 'package:task_manager/ui/screens/WeeklyPage.dart';
-import 'package:task_manager/utils/DataUpdateService.dart';
 
 /*
  Bu sinif tum sayfalarin tasiyicisi konumundadir
@@ -33,10 +34,10 @@ class MainState extends State {
 
   PageController _pageController; //page'lerin arasinda gezinmek icin gerekli
 
-//Bu servis tasklarin takibini yapar ornegin: olsturulan task tamamlanmamis ise onu tamamlanmamis olarak isaretler
-  DataUpdaterService dataUpdaterService = DataUpdaterService();
-//TimeService yazilima gercek zamani sunar ve degisimlerini tetikler
-  TimeService _timeService = TimeService();
+  var services = <IService>[ //Tum servislerin tutuldugu collection.
+    TimeService(), 
+    JobTracker()
+    ];
 
   @override
   Widget build(BuildContext context) {
@@ -65,18 +66,18 @@ class MainState extends State {
     );
   }
 
+  //Tum servisleri baslatir.
   void startServices() {
-    //Servisleri baslatir
-    dataUpdaterService
-        .startService(); //Task'larin durum bilgisini takib eden servisi baslatir
-
-    _timeService.startService(); //Yazilimin gercek zamani almasi icin gerekli
+    services.forEach((service) {
+      service.startService();
+    });
   }
 
+  //Tum servisleri kapatir.
   void closeServices() {
-    //Servisleri kapatan method
-    dataUpdaterService.closeService();
-    _timeService.closeService();
+    services.forEach((service) {
+      service.closeService();
+    });
   }
 
   @override
