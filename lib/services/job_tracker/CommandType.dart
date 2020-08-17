@@ -2,4 +2,4 @@
  * Command tiplerini tutar
  */
 enum CommandType {  
-  status, alarmCreate, alarmCancel }
+  statusIncomplete,statusRunning, alarmCreate, alarmCancel }

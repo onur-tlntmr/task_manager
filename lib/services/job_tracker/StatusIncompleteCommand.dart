@@ -7,12 +7,12 @@ import 'package:task_manager/services/job_tracker/Reciver.dart';
  * 
  * 
  */
-class StatusCommand implements ICommand {
+class StatusIncompleteCommand implements ICommand {
 
   final Reciver reciver = Reciver(); //Operasyonu kullanmak icin gerekli
 
   @override
   void execute(Task task) {
-    reciver.statusUpdate(task); //yapilan is reciver'daki methoda delege edilir
+    reciver.statusIncompleteUpdate(task); //yapilan is reciver'daki methoda delege edilir
   }
 }
