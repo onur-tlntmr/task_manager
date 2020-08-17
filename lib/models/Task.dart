@@ -11,6 +11,8 @@ class Task {
   Duration beginAlarmDuration; //Alarm'in task'in baslangicindan
   //Ne kadar once baslayacagi
 
+  bool isCreateAlarm = false; //Task'in alarm'inin ayarlanip ayarlanmadigini tutar
+
   Task(); //Default constructor
 
   Task.wihtParams(
@@ -19,7 +21,8 @@ class Task {
       this.beginDate,
       this.finishedDate,
       this.status,
-      this.beginAlarmDuration);
+      this.beginAlarmDuration,
+      this.isCreateAlarm);
 
   Map<String, dynamic> toMap() {
     //Task'i map halinde donderir
@@ -38,6 +41,13 @@ class Task {
 
     //zaten null ise degiskene atama yapilmadigi icin null olacaktir
 
+    int createAlarmValue = 0; //Veri tabaninda bool olmadigi icin int olarak map'a
+    //Donusturulur ve ilk olarak alarm yokmus gibi kabul edilir
+
+    if (isCreateAlarm) createAlarmValue = 1; //eger olusturulmus ise deger 1 yapilir
+
+    map["isAlarmCreate"] = createAlarmValue; //map'e gonderilir
+
     return map;
   }
 
@@ -51,12 +61,17 @@ class Task {
 
     final int durationMilliSeconds = o["BeginAlarmDuration"];
 
-    if (durationMilliSeconds != null) { //Eger sure var ise ekle
-      
+    if (durationMilliSeconds != null) {
+      //Eger sure var ise ekle
+
       this.beginAlarmDuration = Duration(
           milliseconds: o["BeginAlarmDuration"]); //Milisaniye cinsinden kullan
     }
-
     //Sure yoksa zaten null olacaktir
+    
+
+    final int createAlarmValue = o["IsAlarmCreate"]; //Alarm
+
+    isCreateAlarm = createAlarmValue == 1; // alarm degeri bool'a donusturlur
   }
 }
