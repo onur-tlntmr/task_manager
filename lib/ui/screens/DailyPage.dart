@@ -147,16 +147,16 @@ class DailyState extends State implements Observer, TimeObserver {
     getData();
   }
 
-  void updateClock() {
+  void updateClock(DateTime newTime) {
     //clockTime'i guncelleyerek ui tetiklenmesini saglar
     setState(() {
-      clockTime = _timeService.realTime;
+      clockTime = newTime;
     });
   }
 
   @override
-  timeChanged() {
+  timeChanged(DateTime newTime) {
     //TimeServis'teki zaman degisince
-    updateClock(); //ui'daki saat guncellenmesi saglanir
+    updateClock(newTime); //ui'daki saat guncellenmesi saglanir
   }
 }
