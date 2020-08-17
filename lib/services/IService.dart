@@ -1,4 +1,4 @@
-abstract class Service{
+abstract class IService{
   void startService();
   void closeService();
 }
