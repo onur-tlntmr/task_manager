@@ -20,6 +20,7 @@ class DbHelper {
   final String colFinishedDate = "FinishedDate";
   final String colStatus = "Status";
   final String colAlarmDuration = "BeginAlarmDuration";
+  final String colIsAlarmCreate = "IsAlarmCreate";
 
   static final DbHelper _dbHelper = DbHelper._internal(); // singleton object
 
@@ -54,7 +55,7 @@ class DbHelper {
     //Db olusturan method
     await db.execute(
         "CREATE TABLE $tblTask($colId INTEGER PRIMARY KEY AUTOINCREMENT , $colTitle TEXT, $colBeginDate TEXT, "
-        "$colFinishedDate TEXT, $colStatus TEXT, $colAlarmDuration INTEGER )");
+        "$colFinishedDate TEXT, $colStatus TEXT, $colAlarmDuration INTEGER, $colIsAlarmCreate INTEGER )");
   }
 
 /*
@@ -116,8 +117,6 @@ class DbHelper {
     //Baslangic zamani istenilen tarihi donderir
     List result = await database.rawQuery(
         "SELECT * FROM $tblTask  WHERE $colBeginDate LIKE'%$strDate%' ORDER BY $colBeginDate");
-
-    print(result);
     return result;
   }
 }
