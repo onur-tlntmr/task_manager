@@ -15,6 +15,7 @@ class DailyPage extends StatefulWidget {
     return DailyState();
   }
 }
+
 /*
  * Bu sinif gunluk tasklari gosterir
  * Veri degisimleri icin observer sinifi olarak implemente edilmistir
@@ -25,7 +26,8 @@ class DailyState extends State implements Observer, TimeObserver {
 
   final DateUtils _utils = DateUtils(); //Bazi tarih formatlamalari icin gerekli
 
-  TimeService _timeService = TimeService(); //Saniye  degisimlerini takip etmek icin gerekli 
+  TimeService _timeService =
+      TimeService(); //Saniye  degisimlerini takip etmek icin gerekli
 
   List<Task> list; //Tasklarin listesi
 
@@ -53,7 +55,7 @@ class DailyState extends State implements Observer, TimeObserver {
   void initState() {
     //State yonetimi basladiginda
     super.initState();
-    
+
     clockTime = _timeService.realTime; //timeServis'ten zaman aliniyor
 
     _timeService.register(this); //Time observer olarak servise ekleniyor
@@ -100,20 +102,21 @@ class DailyState extends State implements Observer, TimeObserver {
   }
 
   void getData() {
-    //task listesini olsuturur
-    var taskFuture = _dataSource.getTasks(); //DB operasyonlari icin gerekli
-
     List<Task> dataTask = List(); // Bos liste olusturuyor
 
     DateTime current = DateTime.now(); //Simdiki zaman seciliyor
 
+    //task listesini olsuturur
+    var taskFuture =
+        _dataSource.getTasksWithDate(current); //DB operasyonlari icin gerekli
+
+    Task task;
     taskFuture.then((data) {
       data.forEach((element) {
         //elemanlar arasindan geziliyor
 
-        Task task = Task.fromObject(element);
-        if (task.beginDate.day == current.day) //task'in gunu simdiki gun ise
-          dataTask.add(task); //task ekeleniyor
+        task = Task.fromObject(element); //kayit task objesine donusturuluyor
+        dataTask.add(task); //task ekeleniyor
       });
     });
 
@@ -144,14 +147,16 @@ class DailyState extends State implements Observer, TimeObserver {
     getData();
   }
 
-  void updateClock() { //clockTime'i guncelleyerek ui tetiklenmesini saglar
+  void updateClock() {
+    //clockTime'i guncelleyerek ui tetiklenmesini saglar
     setState(() {
       clockTime = _timeService.realTime;
     });
   }
 
   @override
-  timeChanged() { //TimeServis'teki zaman degisince
+  timeChanged() {
+    //TimeServis'teki zaman degisince
     updateClock(); //ui'daki saat guncellenmesi saglanir
   }
 }
