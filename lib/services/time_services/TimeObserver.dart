@@ -1,3 +1,3 @@
 abstract class TimeObserver {
-  timeChanged();
+  timeChanged(DateTime newTime);
 }

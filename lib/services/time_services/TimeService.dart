@@ -52,7 +52,7 @@ class TimeService implements TimeObservable, Service {
     //Tum observer'larin guncellenmesini saglayan method
     _observers.forEach((observer) {
       //Tum observer'lar geziliyor
-      observer.timeChanged(); //Zamanin degisti bildirliyor
+      observer.timeChanged(realTime); //Zamanin degisti bildirliyor
     });
   }
 
