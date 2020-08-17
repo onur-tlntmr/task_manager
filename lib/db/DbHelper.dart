@@ -115,7 +115,7 @@ class DbHelper {
 
     //Baslangic zamani istenilen tarihi donderir
     List result = await database.rawQuery(
-        "SELECT * FROM $tblTask ORDER BY $colBeginDate WHERE $colBeginDate LIKE'%$strDate%'");
+        "SELECT * FROM $tblTask  WHERE $colBeginDate LIKE'%$strDate%' ORDER BY $colBeginDate");
 
     print(result);
     return result;
