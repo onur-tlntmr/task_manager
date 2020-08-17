@@ -7,4 +7,4 @@ Version 1.1 için daha optimize ve ileriye dönük bir sistem uygulanmak istenme
 Version 1.1'için uml diagramı aşağıdaki gibidir.
 Not: Örnek olarak ekran sadece dailyPage verilmiştir, çünkü diğerleri diagramı daha da karmaşık hale getirmektedir.
 
-![task_manager](https://user-images.githubusercontent.com/28988388/90322634-56d66600-df5f-11ea-8662-0cb2c9790385.png)
+![image](https://user-images.githubusercontent.com/28988388/90376738-985e3280-e07f-11ea-8b94-521856f2e3a8.png)
