@@ -30,48 +30,54 @@ class JobTracker implements TimeObserver, Observer, IService {
     return _jobTracker;
   }
 
+  //is kuyrugunu dolduran method
   void fillJobs() {
-    //is kuyrugunu dolduran method
-
-    jobs.clear();
+    
+    jobs.clear(); 
 
     DateTime now = DateTime.now();
-    Future<List> future = _dataSource.getTasksWithDate(now);
+    //Bu gunun tasklari aliniyor.
+    Future<List> future = _dataSource.getTasksWithDate(now); 
 
-    future.then((data) {
+    future.then((data) { //Her taskin joblist'i olusturuluyor
       data.forEach((element) {
         Task task = Task.fromObject(element);
         var jobList = createJob(task);
 
-        jobs.addAll(jobList);
+        jobs.addAll(jobList); //ve collection'a ekleniyor
       });
     });
   }
 
-  List<Job> createJob(Task task) {
+  //Tasklardan job olusturan method
+  //Bir taskin birden fazla job'i olacabiligi icin
+  //Job listesi donderir
+  List<Job> createJob(Task task) { 
+
     List<Job> jobList = List();
     DateTime now = DateTime.now();
-    print("CreateJobs()");
-    if (now.isAfter(task.finishedDate) &&
-        !task.isCreateAlarm &&
-        task.beginAlarmDuration != null) {
-      jobList.add(_createAlarmJob(task));
+
+    if (now.isBefore(task.beginDate) && //Eger task baslamamis ise
+        !task.isCreateAlarm && //Alarimi olsturulmamis
+        task.beginAlarmDuration != null) { //alarimi bos degilse
+      jobList.add(_createAlarmJob(task)); //Alarim olstur
     }
 
-    if (now.isBefore(task.beginDate) && task.status == "waiting") {
-      jobList.add(_createStatusRunning(task));
+    if (now.isBefore(task.beginDate) && task.status == "waiting") { //eger task baslamis ise
+      jobList.add(_createStatusRunning(task)); //running job olustur
     }
 
-    if (now.isBefore(task.finishedDate) && //eger task bitmemis ise ve
+    if (now.isBefore(task.finishedDate) && //eger task bitmis ise ve
         task.status == "running") {
-      //bekliyor veya devam ediyor durumunda ise
+      //ve devam ediyor konumundaysa
 
-      jobList.add(_createStatusIncomplete(task));
+      jobList.add(_createStatusIncomplete(task)); //tamamlanmadi job olustur
     }
 
-    return jobList;
+    return jobList; 
   }
 
+/////////////////////// job olusturnan methodlar///////////////////////
   Job _createAlarmJob(Task task) {
     Job job = Job();
 
@@ -109,34 +115,38 @@ class JobTracker implements TimeObserver, Observer, IService {
 
     return job;
   }
+  ////////////////////////////////////////////////////////////
 
+  //Zaman guncellendikce yapilacak olan en yakin isi takib eder
+  //Eger varsa isi yapar ve isi kuyruktan cikarir
   @override
-  void timeChanged(DateTime newTime) {
-    if (jobs.length != 0) {
+  void timeChanged(DateTime newTime) { 
+    if (jobs.length != 0) { 
       Job firstJob = jobs.first;
 
-      int result = newTime.compareTo(firstJob.jobTime);
+      int result = newTime.compareTo(firstJob.jobTime); //yeni zaman ile isi
+                          //karsilastirir eger ayni ise 1, gemis ise -1 doner
 
-      if (result >= 0) {
-        ICommand command = _invoker.invoke(firstJob.commandType);
-        command.execute(firstJob.task);
-        jobs.removeFirst();
+      if (result >= 0) { 
+        ICommand command = _invoker.invoke(firstJob.commandType); //isi yapan komudu getir
+        command.execute(firstJob.task); //isi icra et
+        jobs.removeFirst(); //ve isi kuyruktan cikar
       }
-      print("Jobs Lenght: ${jobs.length}");
     }
   }
 
   @override
-  void update() {
+  void update() { //Verilerde bir guncelleme olunca kendini de gunceller
     fillJobs();
   }
 
+  //bagli oldugu servisleri kapatarak kendini etkisiz hale getirir
   @override
-  void closeService() {
+  void closeService() { 
     _dataSource.unregister(this);
     _timeService.unregister(this);
   }
-
+  //kendini servislere ekleyerek tekrar gorevini icra eder
   @override
   void startService() {
     _dataSource.register(this);
