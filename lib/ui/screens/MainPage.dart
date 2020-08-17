@@ -4,7 +4,7 @@ import 'package:task_manager/services/time_services/TimeService.dart';
 import 'package:task_manager/ui/screens/AddPage.dart';
 import 'package:task_manager/ui/screens/AllPage.dart';
 import 'package:task_manager/ui/screens/DailyPage.dart';
-import 'package:task_manager/source/DataSource.dart';
+import 'package:task_manager/services/data_service/DataSource.dart';
 import 'package:task_manager/ui/screens/MonthlyPage.dart';
 import 'package:task_manager/ui/screens/WeeklyPage.dart';
 import 'package:task_manager/utils/DataUpdateService.dart';

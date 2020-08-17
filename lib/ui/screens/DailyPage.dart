@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/models/Task.dart';
 import 'package:task_manager/services/time_services/TimeObserver.dart';
 import 'package:task_manager/services/time_services/TimeService.dart';
-import 'package:task_manager/source/DataSource.dart';
-import 'package:task_manager/source/Observer.dart';
+import 'package:task_manager/services/data_service/DataSource.dart';
+import 'package:task_manager/services/data_service/Observer.dart';
 import 'package:task_manager/ui/widgets/TaskCard.dart';
 import 'package:task_manager/utils/DateUtils.dart';
 

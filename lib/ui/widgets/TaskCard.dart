@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/models/Task.dart';
-import 'package:task_manager/source/DataSource.dart';
+import 'package:task_manager/services/data_service/DataSource.dart';
 import 'package:task_manager/utils/DateUtils.dart';
 
 //TaskCarWidget tasklari gosterir

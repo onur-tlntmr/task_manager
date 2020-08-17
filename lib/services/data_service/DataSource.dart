@@ -1,7 +1,7 @@
 import 'package:task_manager/db/DbHelper.dart';
 import 'package:task_manager/models/Task.dart';
-import 'package:task_manager/source/Observable.dart';
-import 'package:task_manager/source/Observer.dart';
+import 'package:task_manager/services/data_service/Observable.dart';
+import 'package:task_manager/services/data_service/Observer.dart';
 
 
 /*
